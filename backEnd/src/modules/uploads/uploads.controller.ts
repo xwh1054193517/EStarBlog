@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
+import type { MulterFile } from '../../common/types/multer';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -59,7 +60,7 @@ export class UploadsController {
   @ApiOperation({ summary: 'Upload file to object storage' })
   @ApiOkResponse({ type: UploadFileResponseDto })
   upload(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() file: MulterFile,
     @getCurrentUserDec() user: AccessTokenPayload,
   ) {
     return this.uploadsService.upload(file, user.sub);

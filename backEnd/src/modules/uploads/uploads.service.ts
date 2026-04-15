@@ -10,6 +10,7 @@ import {
   S3Client,
 } from '@aws-sdk/client-s3';
 import { PrismaService } from '../../prisma/prisma.service';
+import { MulterFile } from '../../common/types/multer';
 import { StorageProvider } from '../../generated/prisma';
 
 @Injectable()
@@ -51,7 +52,7 @@ export class UploadsService {
     }
   }
 
-  async upload(file: Express.Multer.File, createdById: string) {
+  async upload(file: MulterFile, createdById: string) {
     this.ensureConfigured();
     if (!file) {
       throw new BadRequestException('File is required');
