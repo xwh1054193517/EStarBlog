@@ -48,9 +48,6 @@ COPY --from=builder /app/dist ./dist
 # 保留 Prisma 自定义输出目录
 COPY --from=builder /app/src/generated ./src/generated
 
-# 某些 Prisma runtime 仍会依赖这些内容，保留更稳
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
 EXPOSE 3001
 
