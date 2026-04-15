@@ -1,0 +1,171 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum ImageType {
+  COVER
+  CONTENT
+}
+
+enum StorageProvider {
+  S3
+}
+
+model User {
+  id        String   @id @default(cuid())
+  username  String   @unique
+  password  String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profile      Profile?
+  posts        Post[]
+  uploadAssets UploadAsset[]
+
+  @@map("users")
+}
+
+model Profile {
+  id          String   @id @default(cuid())
+  displayName String?
+  bio         String?
+  avatar      String?
+  email       String?
+  phone       String?
+  wechat      String?
+  qq          String?
+  website     String?
+  github      String?
+  twitter     String?
+  weibo       String?
+  bilibili    String?
+  youtube     String?
+  location    String?
+  company     String?
+  position    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("profiles")
+}
+
+model Post {
+  id          String    @id @default(cuid())
+  title       String
+  slug        String    @unique
+  content     String
+  excerpt     String?
+  coverImage  String?
+  published   Boolean   @default(false)
+  featured    Boolean   @default(false)
+  views       Int       @default(0)
+  readingTime Int?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  publishedAt DateTime?
+  authorId    String
+  author      User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  categoryId  String?
+  category    Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  tags        PostTag[]
+  images      Image[]
+
+  @@index([published, publishedAt])
+  @@index([categoryId])
+  @@index([authorId])
+  @@map("posts")
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  color       String?
+  icon        String?
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  posts       Post[]
+
+  @@map("categories")
+}
+
+model Tag {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  slug      String    @unique
+  color     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  posts     PostTag[]
+
+  @@map("tags")
+}
+
+model PostTag {
+  id     String @id @default(cuid())
+  postId String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tagId  String
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, tagId])
+  @@index([postId])
+  @@index([tagId])
+  @@map("post_tags")
+}
+
+model UploadAsset {
+  id           String          @id @default(cuid())
+  filename     String
+  originalName String
+  mimeType     String
+  size         Int
+  storageKey   String          @unique
+  url          String
+  bucket       String
+  provider     StorageProvider @default(S3)
+  createdById  String
+  createdBy    User            @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  images       Image[]
+
+  @@index([createdById])
+  @@map("upload_assets")
+}
+
+model Image {
+  id        String      @id @default(cuid())
+  filename  String
+  path      String
+  size      Int
+  mimeType  String
+  type      ImageType   @default(CONTENT)
+  postId    String
+  post      Post        @relation(fields: [postId], references: [id], onDelete: Cascade)
+  assetId   String?
+  asset     UploadAsset? @relation(fields: [assetId], references: [id], onDelete: SetNull)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@index([postId])
+  @@index([type])
+  @@index([assetId])
+  @@map("images")
+}

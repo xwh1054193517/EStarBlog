@@ -1,0 +1,50 @@
+import type { Metadata } from "next";
+import Script from "next/script";
+
+import "./globals.css";
+
+export const metadata: Metadata = {
+  title: "恒星博客",
+  description: "一个长期更新的技术博客，记录思考、技术、生活。"
+};
+
+const themeSetScrip = `
+  (function () {
+    try {
+      var stored = localStorage.getItem('theme');
+      var dark = stored ? stored === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    } catch (error) {
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
+  })();
+`;
+
+export default function RootLayout({
+  children
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html
+      lang="zh-CN"
+      data-theme="light"
+      data-scroll-behavior="smooth"
+      suppressHydrationWarning
+    >
+      <head>
+        {/* 中性风格图标 自适应 */}
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css"
+        />
+        <Script id="theme-init" strategy="beforeInteractive">
+          {themeSetScrip}
+        </Script>
+      </head>
+      <body>
+          {children}
+      </body>
+    </html>
+  );
+}

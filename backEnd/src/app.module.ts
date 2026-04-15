@@ -1,10 +1,36 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { ConfigModule } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
+import { AuthModule } from './modules/auth/auth.module';
+import { CategoriesModule } from './modules/categories/categories.module';
+import { RolesGuard } from './common/guards/roles.guard';
+import { HealthController } from './health.controller';
+import { PostsModule } from './modules/posts/posts.module';
+import { PresenceModule } from './modules/presence/presence.module';
+import { PrismaModule } from './prisma/prisma.module';
+import { RedisModule } from './redis/redis.module';
+import { StatsModule } from './modules/stats/stats.module';
+import { TagsModule } from './modules/tags/tags.module';
+import { UploadsModule } from './modules/uploads/uploads.module';
 
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: ['../.env', '.env'],
+    }),
+    ScheduleModule.forRoot(),
+    PrismaModule,
+    RedisModule,
+    AuthModule,
+    PostsModule,
+    CategoriesModule,
+    TagsModule,
+    PresenceModule,
+    StatsModule,
+    UploadsModule,
+  ],
+  controllers: [HealthController],
+  providers: [RolesGuard],
 })
 export class AppModule {}

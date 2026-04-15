@@ -1,0 +1,11 @@
+-- AlterTable
+ALTER TABLE "AdminUser" ALTER COLUMN "id" DROP DEFAULT;
+
+-- AlterTable
+ALTER TABLE "Category" ALTER COLUMN "id" DROP DEFAULT;
+
+-- AlterTable
+ALTER TABLE "Post" ALTER COLUMN "id" DROP DEFAULT;
+
+-- AlterTable
+ALTER TABLE "Tag" ALTER COLUMN "id" DROP DEFAULT;
