@@ -3,3 +3,4 @@
 **dist
 frontEnd/.next/
 backEnd/src/generated
+*.trae

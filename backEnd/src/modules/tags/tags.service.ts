@@ -3,6 +3,10 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { slugify } from '../../common/utils/slugify';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
+import {
+  SearchQueryDto,
+  PaginatedResult,
+} from '../../common/dto/pagination.dto';
 
 @Injectable()
 export class TagsService {
@@ -11,7 +15,13 @@ export class TagsService {
   async findAllPublic() {
     const tags = await this.prisma.tag.findMany({
       orderBy: [{ createdAt: 'desc' }],
-      include: {
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        color: true,
+        createdAt: true,
+        updatedAt: true,
         _count: {
           select: {
             posts: {
@@ -27,31 +37,70 @@ export class TagsService {
     });
 
     return tags.map((item) => ({
-      ...item,
+      id: item.id,
+      name: item.name,
+      slug: item.slug,
+      color: item.color,
       postCount: item._count.posts,
       createdAt: item.createdAt.toISOString(),
       updatedAt: item.updatedAt.toISOString(),
     }));
   }
 
-  async findAllAdmin() {
-    const tags = await this.prisma.tag.findMany({
-      orderBy: [{ createdAt: 'desc' }],
-      include: {
-        _count: {
-          select: {
-            posts: true,
+  async findAllAdmin(
+    query: SearchQueryDto,
+  ): Promise<PaginatedResult<{ id: string; name: string; slug: string; color: string | null; postCount: number; createdAt: string; updatedAt: string }>> {
+    const page = query.page ?? 1;
+    const pageSize = query.pageSize ?? 10;
+    const skip = (page - 1) * pageSize;
+
+    const where = query.search
+      ? {
+          OR: [
+            { name: { contains: query.search, mode: 'insensitive' as const } },
+            { slug: { contains: query.search, mode: 'insensitive' as const } },
+          ],
+        }
+      : {};
+
+    const [tags, total] = await Promise.all([
+      this.prisma.tag.findMany({
+        where,
+        skip,
+        take: pageSize,
+        orderBy: [{ createdAt: 'desc' }],
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          color: true,
+          createdAt: true,
+          updatedAt: true,
+          _count: {
+            select: {
+              posts: true,
+            },
           },
         },
-      },
-    });
+      }),
+      this.prisma.tag.count({ where }),
+    ]);
 
-    return tags.map((item) => ({
-      ...item,
-      postCount: item._count.posts,
-      createdAt: item.createdAt.toISOString(),
-      updatedAt: item.updatedAt.toISOString(),
-    }));
+    return {
+      data: tags.map((item) => ({
+        id: item.id,
+        name: item.name,
+        slug: item.slug,
+        color: item.color,
+        postCount: item._count.posts,
+        createdAt: item.createdAt.toISOString(),
+        updatedAt: item.updatedAt.toISOString(),
+      })),
+      total,
+      page,
+      pageSize,
+      totalPages: Math.ceil(total / pageSize),
+    };
   }
 
   async create(dto: CreateTagDto) {
@@ -60,6 +109,14 @@ export class TagsService {
         name: dto.name,
         slug: dto.slug ? slugify(dto.slug) : slugify(dto.name),
         color: dto.color,
+      },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        color: true,
+        createdAt: true,
+        updatedAt: true,
       },
     });
 
@@ -72,7 +129,6 @@ export class TagsService {
   }
 
   async update(id: string, dto: UpdateTagDto) {
-    await this.ensureExists(id);
     const tag = await this.prisma.tag.update({
       where: { id },
       data: {
@@ -80,7 +136,13 @@ export class TagsService {
         ...(dto.slug !== undefined ? { slug: slugify(dto.slug) } : {}),
         ...(dto.color !== undefined ? { color: dto.color } : {}),
       },
-      include: {
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        color: true,
+        createdAt: true,
+        updatedAt: true,
         _count: {
           select: {
             posts: true,
@@ -90,7 +152,10 @@ export class TagsService {
     });
 
     return {
-      ...tag,
+      id: tag.id,
+      name: tag.name,
+      slug: tag.slug,
+      color: tag.color,
       postCount: tag._count.posts,
       createdAt: tag.createdAt.toISOString(),
       updatedAt: tag.updatedAt.toISOString(),
@@ -98,18 +163,27 @@ export class TagsService {
   }
 
   async remove(id: string) {
-    await this.ensureExists(id);
-    await this.prisma.$transaction([
-      this.prisma.postTag.deleteMany({ where: { tagId: id } }),
-      this.prisma.tag.delete({ where: { id } }),
-    ]);
-    return { message: 'Tag deleted successfully' };
-  }
-
-  private async ensureExists(id: string) {
-    const tag = await this.prisma.tag.findUnique({ where: { id } });
-    if (!tag) {
+    try {
+      await this.prisma.$transaction([
+        this.prisma.postTag.deleteMany({ where: { tagId: id } }),
+        this.prisma.tag.delete({ where: { id } }),
+      ]);
+      return { message: 'Tag deleted successfully' };
+    } catch {
       throw new NotFoundException(`Tag ${id} not found`);
     }
+  }
+
+  async batchDelete(ids: string[]) {
+    if (!ids || ids.length === 0) {
+      return { message: 'No tags to delete' };
+    }
+
+    await this.prisma.$transaction([
+      this.prisma.postTag.deleteMany({ where: { tagId: { in: ids } } }),
+      this.prisma.tag.deleteMany({ where: { id: { in: ids } } }),
+    ]);
+
+    return { message: `${ids.length} tags deleted successfully` };
   }
 }

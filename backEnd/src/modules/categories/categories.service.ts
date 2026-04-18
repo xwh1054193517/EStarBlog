@@ -3,6 +3,10 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { slugify } from '../../common/utils/slugify';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import {
+  SearchQueryDto,
+  PaginatedResult,
+} from '../../common/dto/pagination.dto';
 
 @Injectable()
 export class CategoriesService {
@@ -11,7 +15,16 @@ export class CategoriesService {
   async findAllPublic() {
     const categories = await this.prisma.category.findMany({
       orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
-      include: {
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        description: true,
+        color: true,
+        icon: true,
+        sortOrder: true,
+        createdAt: true,
+        updatedAt: true,
         _count: {
           select: {
             posts: {
@@ -25,31 +38,90 @@ export class CategoriesService {
     });
 
     return categories.map((item) => ({
-      ...item,
+      id: item.id,
+      name: item.name,
+      slug: item.slug,
+      description: item.description,
+      color: item.color,
+      icon: item.icon,
+      sortOrder: item.sortOrder,
       postCount: item._count.posts,
       createdAt: item.createdAt.toISOString(),
       updatedAt: item.updatedAt.toISOString(),
     }));
   }
 
-  async findAllAdmin() {
-    const categories = await this.prisma.category.findMany({
-      orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
-      include: {
-        _count: {
-          select: {
-            posts: true,
+  async findAllAdmin(query: SearchQueryDto): Promise<
+    PaginatedResult<{
+      id: string;
+      name: string;
+      slug: string;
+      description: string | null;
+      color: string | null;
+      icon: string | null;
+      sortOrder: number;
+      postCount: number;
+      createdAt: string;
+      updatedAt: string;
+    }>
+  > {
+    const page = query.page ?? 1;
+    const pageSize = query.pageSize ?? 10;
+    const skip = (page - 1) * pageSize;
+
+    const where = query.search
+      ? {
+          OR: [
+            { name: { contains: query.search, mode: 'insensitive' as const } },
+            { slug: { contains: query.search, mode: 'insensitive' as const } },
+          ],
+        }
+      : {};
+
+    const [categories, total] = await Promise.all([
+      this.prisma.category.findMany({
+        where,
+        skip,
+        take: pageSize,
+        orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          description: true,
+          color: true,
+          icon: true,
+          sortOrder: true,
+          createdAt: true,
+          updatedAt: true,
+          _count: {
+            select: {
+              posts: true,
+            },
           },
         },
-      },
-    });
+      }),
+      this.prisma.category.count({ where }),
+    ]);
 
-    return categories.map((item) => ({
-      ...item,
-      postCount: item._count.posts,
-      createdAt: item.createdAt.toISOString(),
-      updatedAt: item.updatedAt.toISOString(),
-    }));
+    return {
+      data: categories.map((item) => ({
+        id: item.id,
+        name: item.name,
+        slug: item.slug,
+        description: item.description,
+        color: item.color,
+        icon: item.icon,
+        sortOrder: item.sortOrder,
+        postCount: item._count.posts,
+        createdAt: item.createdAt.toISOString(),
+        updatedAt: item.updatedAt.toISOString(),
+      })),
+      total,
+      page,
+      pageSize,
+      totalPages: Math.ceil(total / pageSize),
+    };
   }
 
   async create(dto: CreateCategoryDto) {
@@ -62,6 +134,17 @@ export class CategoriesService {
         icon: dto.icon,
         sortOrder: dto.sortOrder ?? 0,
       },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        description: true,
+        color: true,
+        icon: true,
+        sortOrder: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
 
     return {
@@ -73,7 +156,6 @@ export class CategoriesService {
   }
 
   async update(id: string, dto: UpdateCategoryDto) {
-    await this.ensureExists(id);
     const category = await this.prisma.category.update({
       where: { id },
       data: {
@@ -86,7 +168,16 @@ export class CategoriesService {
         ...(dto.icon !== undefined ? { icon: dto.icon } : {}),
         ...(dto.sortOrder !== undefined ? { sortOrder: dto.sortOrder } : {}),
       },
-      include: {
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        description: true,
+        color: true,
+        icon: true,
+        sortOrder: true,
+        createdAt: true,
+        updatedAt: true,
         _count: {
           select: {
             posts: true,
@@ -96,7 +187,13 @@ export class CategoriesService {
     });
 
     return {
-      ...category,
+      id: category.id,
+      name: category.name,
+      slug: category.slug,
+      description: category.description,
+      color: category.color,
+      icon: category.icon,
+      sortOrder: category.sortOrder,
       postCount: category._count.posts,
       createdAt: category.createdAt.toISOString(),
       updatedAt: category.updatedAt.toISOString(),
@@ -104,15 +201,21 @@ export class CategoriesService {
   }
 
   async remove(id: string) {
-    await this.ensureExists(id);
-    await this.prisma.category.delete({ where: { id } });
-    return { message: 'Category deleted successfully' };
-  }
-
-  private async ensureExists(id: string) {
-    const category = await this.prisma.category.findUnique({ where: { id } });
-    if (!category) {
+    try {
+      await this.prisma.category.delete({ where: { id } });
+      return { message: 'Category deleted successfully' };
+    } catch {
       throw new NotFoundException(`Category ${id} not found`);
     }
+  }
+
+  async batchDelete(ids: string[]) {
+    if (!ids || ids.length === 0) {
+      return { message: 'No categories to delete' };
+    }
+
+    await this.prisma.category.deleteMany({ where: { id: { in: ids } } });
+
+    return { message: `${ids.length} categories deleted successfully` };
   }
 }

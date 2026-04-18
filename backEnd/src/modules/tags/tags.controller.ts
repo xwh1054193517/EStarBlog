@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -20,8 +21,10 @@ import { RolesGuard } from '../../common/guards/roles.guard';
 import { Role } from '../../generated/prisma';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
+import { BatchDeleteTagDto } from './dto/batch-delete-tag.dto';
 import { TagEntity } from './entities/tag.entity';
 import { TagsService } from './tags.service';
+import { SearchQueryDto } from '../../common/dto/pagination.dto';
 
 @ApiTags('Tags')
 @Controller()
@@ -39,8 +42,8 @@ export class TagsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   @ApiBearerAuth()
-  findAllAdmin() {
-    return this.tagsService.findAllAdmin();
+  findAllAdmin(@Query() query: SearchQueryDto) {
+    return this.tagsService.findAllAdmin(query);
   }
 
   @Post('admin/tags')
@@ -65,5 +68,13 @@ export class TagsController {
   @ApiBearerAuth()
   remove(@Param('id') id: string) {
     return this.tagsService.remove(id);
+  }
+
+  @Post('admin/tags/batch')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  batchDelete(@Body() dto: BatchDeleteTagDto) {
+    return this.tagsService.batchDelete(dto.ids);
   }
 }

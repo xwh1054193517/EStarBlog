@@ -5,10 +5,17 @@ import { PrismaClient } from '../generated/prisma';
 export class PrismaService extends PrismaClient implements OnModuleInit {
   constructor() {
     super({
-      log: [{ emit: 'stdout', level: 'query' }],
+      log: process.env.NODE_ENV === 'development'
+        ? [{ emit: 'stdout', level: 'query' }]
+        : [{ emit: 'event', level: 'error' }],
     });
   }
+
   async onModuleInit() {
     await this.$connect();
+  }
+
+  async onModuleDestroy() {
+    await this.$disconnect();
   }
 }

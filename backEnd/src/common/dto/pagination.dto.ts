@@ -1,16 +1,35 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { IsOptional, IsString, IsInt, Min, Max } from 'class-validator';
+import { Type } from 'class-transformer';
 
-// 页面返回参数
-export class PaginationDto {
-  @ApiProperty()
-  page: number;
+export class PaginationQueryDto {
+  @ApiPropertyOptional({ description: 'Page number', default: 1 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page?: number = 1;
 
-  @ApiProperty()
-  pageSize: number;
+  @ApiPropertyOptional({ description: 'Page size', default: 10 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  pageSize?: number = 10;
+}
 
-  @ApiProperty()
+export class SearchQueryDto extends PaginationQueryDto {
+  @ApiPropertyOptional({ description: 'Search keyword' })
+  @IsOptional()
+  @IsString()
+  search?: string;
+}
+
+export interface PaginatedResult<T> {
+  data: T[];
   total: number;
-
-  @ApiProperty()
+  page: number;
+  pageSize: number;
   totalPages: number;
 }

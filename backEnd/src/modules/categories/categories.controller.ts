@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -21,7 +22,9 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { BatchDeleteCategoryDto } from './dto/batch-delete-category.dto';
 import { CategoryEntity } from './entities/category.entity';
+import { SearchQueryDto } from '../../common/dto/pagination.dto';
 
 @ApiTags('Categories')
 @Controller()
@@ -41,8 +44,8 @@ export class CategoriesController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'List admin categories' })
   @ApiOkResponse({ type: CategoryEntity, isArray: true })
-  findAllAdmin() {
-    return this.categoriesService.findAllAdmin();
+  findAllAdmin(@Query() query: SearchQueryDto) {
+    return this.categoriesService.findAllAdmin(query);
   }
 
   @Post('admin/categories')
@@ -67,5 +70,13 @@ export class CategoriesController {
   @ApiBearerAuth()
   remove(@Param('id') id: string) {
     return this.categoriesService.remove(id);
+  }
+
+  @Post('admin/categories/batch')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  batchDelete(@Body() dto: BatchDeleteCategoryDto) {
+    return this.categoriesService.batchDelete(dto.ids);
   }
 }

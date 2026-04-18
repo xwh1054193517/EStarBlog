@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AuthModule } from './modules/auth/auth.module';
 import { CategoriesModule } from './modules/categories/categories.module';
+import { ProfileModule } from './modules/profile/profile.module';
 import { RolesGuard } from './common/guards/roles.guard';
 import { HealthController } from './health.controller';
 import { PostsModule } from './modules/posts/posts.module';
@@ -29,6 +30,7 @@ import { UploadsModule } from './modules/uploads/uploads.module';
     PresenceModule,
     StatsModule,
     UploadsModule,
+    ProfileModule,
   ],
   controllers: [HealthController],
   providers: [RolesGuard],

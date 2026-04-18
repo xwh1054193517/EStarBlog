@@ -102,6 +102,8 @@ model Category {
   updatedAt   DateTime @updatedAt
   posts       Post[]
 
+  @@index([name])
+  @@index([slug])
   @@map("categories")
 }
 
@@ -114,6 +116,8 @@ model Tag {
   updatedAt DateTime  @updatedAt
   posts     PostTag[]
 
+  @@index([name])
+  @@index([slug])
   @@map("tags")
 }
 
