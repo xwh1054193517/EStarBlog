@@ -4,17 +4,21 @@ import { usePathname } from "next/navigation";
 import Footer from "@/components/layouts/footer";
 import Header from "@/components/layouts/header";
 import Navbar from "@/components/layouts/navbar";
-import type { SiteData } from "@/lib/types";
+import FloatButton from "@/components/ui/FloatButton";
 import Sidebar from "./sidebar";
+import type { SiteData, Article, TocItem, MomentItem } from "@/lib/types";
 
 interface DefaultLayoutProps {
   children: React.ReactNode;
   siteData: SiteData;
   pageType?: "home" | "post" | "page";
   showSidebar?: boolean;
-  headerVariant?: "home" | "page" | "none";
+  headerVariant?: "home" | "page" | "post";
   headerTitle?: string;
   headerSubtitle?: string;
+  article?: Article;
+  toc?: TocItem[];
+  moments?: MomentItem[];
 }
 
 export default function DefaultLayout({
@@ -22,11 +26,17 @@ export default function DefaultLayout({
   siteData,
   pageType = "page",
   showSidebar = true,
-  headerVariant = pageType === "home" ? "home" : "none",
+  headerVariant,
   headerTitle,
-  headerSubtitle
+  headerSubtitle,
+  article,
+  toc,
+  moments
 }: DefaultLayoutProps) {
-  usePathname();
+  const pathname = usePathname();
+  const effectiveHeaderVariant =
+    headerVariant ?? (pageType === "home" ? "home" : pageType === "post" ? "post" : "page");
+  const showMomentWidget = pageType === "home" && moments && moments.length > 0;
 
   return (
     <div className="layout-wrapper">
@@ -34,17 +44,25 @@ export default function DefaultLayout({
       <Navbar siteData={siteData} showHeader={pageType !== "page"} />
       <Header
         siteData={siteData}
-        variant={headerVariant}
+        variant={effectiveHeaderVariant}
         title={headerTitle}
         subtitle={headerSubtitle}
+        article={article}
       />
       <main className="page-main">
         <div className="main-layout">
-          {showSidebar ? <Sidebar siteData={siteData} isArticlePage={pageType === "post"} /> : null}
           <div className={`main-content${showSidebar ? "" : " full-width"}`}>{children}</div>
+          {showSidebar ? (
+            <Sidebar
+              siteData={siteData}
+              isArticlePage={pageType === "post"}
+              toc={pageType === "post" ? toc : undefined}
+            />
+          ) : null}
         </div>
       </main>
       <Footer siteData={siteData} />
+      <FloatButton />
     </div>
   );
 }

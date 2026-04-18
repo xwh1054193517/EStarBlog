@@ -13,6 +13,7 @@ export interface MenuItem {
 export interface CategoryItem {
   id: number;
   name: string;
+  slug: string;
   url: string;
   count: number;
 }
@@ -57,14 +58,34 @@ export interface FriendItem {
   description: string;
 }
 
+export interface MomentVideo {
+  url: string;
+  platform?: "youtube" | "bilibili" | "local";
+  video_id?: string;
+}
+
+export interface MomentMusic {
+  server: "netease" | "tencent" | "kugou" | "xiami" | "baidu";
+  type: "song" | "playlist" | "album" | "search" | "artist";
+  id: string;
+}
+
+export interface MomentLink {
+  url: string;
+  title: string;
+  favicon?: string;
+}
+
 export interface MomentItem {
   id: number;
   content: {
-    text: string;
+    text?: string;
     images?: string[];
-    video?: string;
-    link?: string;
-    music?: string;
+    location?: string;
+    tags?: string;
+    video?: MomentVideo;
+    music?: MomentMusic;
+    link?: MomentLink;
   };
   publishTime: string;
 }
@@ -74,6 +95,12 @@ export interface TocSection {
   text: string;
   level: number;
   body: string;
+}
+
+export interface TocItem {
+  id: string;
+  text: string;
+  level: number;
 }
 
 export interface Article {
@@ -95,6 +122,13 @@ export interface Article {
     url: string;
   };
   sections: TocSection[];
+  isTop?: boolean;
+  isEssence?: boolean;
+  tags?: Array<{
+    id: number;
+    name: string;
+    url: string;
+  }>;
 }
 
 export interface BlogConfig {
@@ -113,8 +147,6 @@ export interface BasicConfig {
   authorDesc: string;
   authorAvatar: string;
   homeUrl: string;
-  icp?: string;
-  policeRecord?: string;
 }
 
 export interface SiteStats {

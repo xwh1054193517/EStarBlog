@@ -23,12 +23,15 @@ export default function AuthorCard({ siteData }: { siteData: SiteData }) {
           <div className="num">{siteData.tags.length}</div>
         </Link>
       </div>
-      <Link href="/subscribe" className="card-info-btn">
-        订阅本站
-      </Link>
       <div className="card-info-icons">
         {siteData.blogConfig.sidebarSocial.map((contact) => (
-          <a key={contact.name} href={contact.url} className="icon" target="_blank" rel="noreferrer">
+          <a
+            key={contact.name}
+            href={contact.url}
+            className="icon"
+            target="_blank"
+            rel="noreferrer"
+          >
             <i className={`ri-${contact.icon}`} />
           </a>
         ))}

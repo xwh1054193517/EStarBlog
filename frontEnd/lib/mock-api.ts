@@ -1,5 +1,5 @@
-import { mockArticle, mockSiteData } from "@/lib/mock-data";
-import type { Article, SiteData, TagsOverview } from "@/lib/types";
+import { mockArticle, mockSiteData, mockArticles } from "@/lib/mock-data";
+import type { Article, SiteData, TagsOverview, MomentItem } from "@/lib/types";
 
 const wait = (ms = 60) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -13,6 +13,11 @@ export async function getMockArticleBySlug(_slug: string): Promise<Article> {
   return mockArticle;
 }
 
+export async function getMockArticles(): Promise<Article[]> {
+  await wait();
+  return mockArticles;
+}
+
 export async function getMockTagsOverview(): Promise<TagsOverview> {
   await wait();
 
@@ -24,4 +29,9 @@ export async function getMockTagsOverview(): Promise<TagsOverview> {
     totalTaggedPosts: tags.reduce((sum, tag) => sum + tag.count, 0),
     hottestTag: tags[0] ?? null
   };
+}
+
+export async function getMockMoments(): Promise<MomentItem[]> {
+  await wait();
+  return mockSiteData.moments;
 }

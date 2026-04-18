@@ -15,6 +15,7 @@ export default function Buttons({ onToggleDrawer }: { onToggleDrawer: () => void
     setIsDark(nextDark);
     document.documentElement.setAttribute("data-theme", nextDark ? "dark" : "light");
     localStorage.setItem("theme", nextDark ? "dark" : "light");
+    window.dispatchEvent(new Event("themechange"));
   };
 
   return (

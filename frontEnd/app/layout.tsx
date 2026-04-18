@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 
+import { QueryProvider } from "@/components/providers/QueryProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -43,7 +44,7 @@ export default function RootLayout({
         </Script>
       </head>
       <body>
-          {children}
+        <QueryProvider>{children}</QueryProvider>
       </body>
     </html>
   );

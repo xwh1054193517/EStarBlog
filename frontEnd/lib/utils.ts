@@ -1,5 +1,9 @@
 import type { ArchiveItem, TagItem } from "@/lib/types";
-
+import { twMerge } from "tailwind-merge";
+import { type ClassValue, clsx } from "clsx";
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
 export function formatFriendly(value?: string) {
   if (!value) return "";
   return new Intl.DateTimeFormat("zh-CN", {
@@ -10,7 +14,11 @@ export function formatFriendly(value?: string) {
 }
 
 export function countWords(content: string) {
-  return content.replace(/[#*_`>\-\n]/g, " ").trim().split(/\s+/).filter(Boolean).length;
+  return content
+    .replace(/[#*_`>\-\n]/g, " ")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean).length;
 }
 
 export function estimateReadingTime(content: string, wordsPerMinute = 300) {
