@@ -33,3 +33,17 @@ export interface PaginatedResult<T> {
   pageSize: number;
   totalPages: number;
 }
+
+export class PaginationDto {
+  @ApiPropertyOptional({ description: 'Page number', default: 1 })
+  page: number = 1;
+
+  @ApiPropertyOptional({ description: 'Page size', default: 10 })
+  pageSize: number = 10;
+
+  @ApiPropertyOptional({ description: 'Total items', default: 0 })
+  total: number = 0;
+
+  @ApiPropertyOptional({ description: 'Total pages', default: 0 })
+  totalPages: number = 0;
+}
