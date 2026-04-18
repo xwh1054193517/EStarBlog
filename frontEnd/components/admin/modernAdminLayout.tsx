@@ -17,7 +17,8 @@ import {
   User,
   Menu,
   Sparkles,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Settings
 } from "lucide-react";
 
 interface ModernAdminLayoutProps {
@@ -86,6 +87,12 @@ export default function ModernAdminLayout({ children }: ModernAdminLayoutProps) 
       href: "/admin/profile",
       icon: User,
       current: pathname?.startsWith("/admin/profile")
+    },
+    {
+      name: "系统设置",
+      href: "/admin/settings",
+      icon: Settings,
+      current: pathname?.startsWith("/admin/settings")
     }
   ];
 

@@ -8,8 +8,6 @@
 
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import {
   Dialog,
   DialogContent,
@@ -19,28 +17,26 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Loader2 } from "lucide-react";
 import {
   Form,
-  FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
+  FormControl,
+  FormMessage,
+  FormDescription
 } from "@/components/ui/form";
-import { Textarea } from "@/components/ui/textarea";
-import { Loader2 } from "lucide-react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createCategory, updateCategory, Category } from "@/lib/api/categoryApi";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { createCategory, updateCategory } from "@/lib/api/categoryApi";
 import { toast } from "sonner";
 
-const categorySchema = z.object({
-  name: z.string().min(1, "分类名称不能为空").max(50, "分类名称不能超过50个字符"),
-  slug: z.string().min(1, "URL slug不能为空").max(50, "URL slug不能超过50个字符"),
-  description: z.string().max(200, "描述不能超过200个字符").optional()
-});
-
-type CategoryFormData = z.infer<typeof categorySchema>;
+interface CategoryFormData {
+  name: string;
+  slug: string;
+  description: string;
+}
 
 interface CategoryDialogProps {
   open: boolean;
@@ -87,7 +83,6 @@ export default function CategoryDialog({ open, onClose, category }: CategoryDial
   });
 
   const form = useForm<CategoryFormData>({
-    resolver: zodResolver(categorySchema),
     defaultValues: {
       name: "",
       slug: "",

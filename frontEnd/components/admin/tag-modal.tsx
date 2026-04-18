@@ -8,8 +8,6 @@
 
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import {
   Dialog,
   DialogContent,
@@ -33,13 +31,11 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createTag, updateTag, Tag } from "@/lib/api/tagApi";
 import { toast } from "sonner";
 
-const tagSchema = z.object({
-  name: z.string().min(1, "标签名称不能为空").max(30, "标签名称不能超过30个字符"),
-  slug: z.string().min(1, "URL slug不能为空").max(30, "URL slug不能超过30个字符"),
-  color: z.string().optional()
-});
-
-type TagFormData = z.infer<typeof tagSchema>;
+interface TagFormData {
+  name: string;
+  slug: string;
+  color: string;
+}
 
 interface TagDialogProps {
   open: boolean;
@@ -84,7 +80,6 @@ export default function TagDialog({ open, onClose, tag }: TagDialogProps) {
   });
 
   const form = useForm<TagFormData>({
-    resolver: zodResolver(tagSchema as any),
     defaultValues: {
       name: "",
       slug: "",
@@ -94,7 +89,6 @@ export default function TagDialog({ open, onClose, tag }: TagDialogProps) {
 
   const { watch, setValue, reset } = form;
   const name = watch("name");
-  const color = watch("color");
 
   useEffect(() => {
     if (!isEdit && name) {
@@ -124,25 +118,6 @@ export default function TagDialog({ open, onClose, tag }: TagDialogProps) {
       }
     }
   }, [open, tag, reset]);
-
-  const presetColors = [
-    "#ef4444",
-    "#f97316",
-    "#f59e0b",
-    "#eab308",
-    "#84cc16",
-    "#22c55e",
-    "#10b981",
-    "#14b8a6",
-    "#06b6d4",
-    "#0ea5e9",
-    "#3b82f6",
-    "#6366f1",
-    "#8b5cf6",
-    "#a855f7",
-    "#d946ef",
-    "#ec4899"
-  ];
 
   const handleClose = () => {
     setIsLoading(false);
@@ -204,42 +179,30 @@ export default function TagDialog({ open, onClose, tag }: TagDialogProps) {
               name="color"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>颜色</FormLabel>
+                  <FormLabel>标签颜色（可选）</FormLabel>
                   <FormControl>
-                    <div className="flex flex-wrap gap-2">
-                      {/* {presetColors.map((c) => (
-                        <button
-                          key={c}
-                          type="button"
-                          onClick={() => field.onChange(c)}
-                          className={`w-6 h-6 rounded-full border-2 transition-all ${
-                            field.value === c
-                              ? "border-gray-900 dark:border-white scale-110"
-                              : "border-transparent hover:scale-110"
-                          }`}
-                          style={{ backgroundColor: c }}
-                        />
-                      ))} */}
-                      <input
-                        type="color"
-                        value={field.value || "#6366f1"}
-                        onChange={(e) => field.onChange(e.target.value)}
-                        className="w-6 h-6 rounded-full cursor-pointer border-0"
-                      />
-                    </div>
+                    <Input placeholder="#3b82f6 或 blue" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <div className="flex justify-end space-x-2 pt-4">
+            <div className="flex justify-end space-x-3 pt-4">
               <Button type="button" variant="outline" onClick={handleClose} disabled={isLoading}>
                 取消
               </Button>
               <Button type="submit" disabled={isLoading}>
-                {isLoading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                {isEdit ? "更新" : "创建"}
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    {isEdit ? "更新中..." : "创建中..."}
+                  </>
+                ) : isEdit ? (
+                  "更新标签"
+                ) : (
+                  "创建标签"
+                )}
               </Button>
             </div>
           </form>

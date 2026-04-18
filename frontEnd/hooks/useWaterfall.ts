@@ -31,9 +31,10 @@ export function useWaterfall(options: WaterfallOptions) {
     const getColumns = (): number => {
       const width = window.innerWidth;
       const opts = optionsRef.current;
-      if (width <= opts.breakpoints.mobile) return 1;
-      if (width <= opts.breakpoints.tablet) return 2;
-      return opts.columns;
+      const bp = opts.breakpoints;
+      if (bp && width <= bp.mobile) return 1;
+      if (bp && width <= bp.tablet) return 2;
+      return opts.columns ?? 2;
     };
 
     const waitForImagesLoad = (): Promise<void> => {
@@ -78,7 +79,7 @@ export function useWaterfall(options: WaterfallOptions) {
 
       const containerWidth = container.clientWidth;
       const cols = getColumns();
-      const columnWidth = (containerWidth - optionsRef.current.gap * (cols - 1)) / cols;
+      const columnWidth = (containerWidth - gap * (cols - 1)) / cols;
 
       requestAnimationFrame(() => {
         const columnsHeight: number[] = new Array(cols).fill(0);
@@ -89,13 +90,13 @@ export function useWaterfall(options: WaterfallOptions) {
 
           item.style.position = "absolute";
           item.style.width = `${columnWidth}px`;
-          item.style.left = `${columnIndex * (columnWidth + optionsRef.current.gap)}px`;
+          item.style.left = `${columnIndex * (columnWidth + gap)}px`;
           item.style.top = `${minHeight}px`;
 
-          columnsHeight[columnIndex] = minHeight + item.offsetHeight + optionsRef.current.gap;
+          columnsHeight[columnIndex] = minHeight + item.offsetHeight + gap;
         });
 
-        const maxHeight = Math.max(...columnsHeight) - optionsRef.current.gap;
+        const maxHeight = Math.max(...columnsHeight) - gap;
         container.style.height = `${maxHeight}px`;
       });
     };

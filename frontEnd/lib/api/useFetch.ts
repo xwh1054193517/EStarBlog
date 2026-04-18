@@ -46,11 +46,9 @@ function getCookie(name: string): string | null {
   return cookies[name] || null;
 }
 
-function setCookie(name: string, value: string, expiresInSeconds: number) {
+function setCookie(name: string, value: string) {
   if (typeof document === "undefined") return;
-  const expires = new Date();
-  expires.setTime(expires.getTime() + expiresInSeconds * 1000);
-  document.cookie = `${name}=${value}; path=/; expires=${expires.toUTCString()}; SameSite=Strict`;
+  document.cookie = `${name}=${value}; path=/; SameSite=Strict`;
 }
 
 function deleteCookie(name: string) {
@@ -58,51 +56,61 @@ function deleteCookie(name: string) {
   document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
 }
 
-let refreshPromise: Promise<boolean> | null = null;
+type RefreshCallback = () => Promise<boolean>;
+let refreshCallback: RefreshCallback | null = null;
 
-async function refreshAccessToken(): Promise<boolean> {
-  const refreshToken = getCookie("refreshToken");
-  if (!refreshToken) return false;
+export function setRefreshCallback(cb: RefreshCallback) {
+  refreshCallback = cb;
+}
 
-  if (refreshPromise) {
-    return refreshPromise;
+let pendingRefreshPromise: Promise<boolean> | null = null;
+
+async function doRefresh(): Promise<boolean> {
+  if (pendingRefreshPromise) {
+    return pendingRefreshPromise;
   }
 
-  refreshPromise = (async () => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/auth/sessions/refresh`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ refreshToken })
-      });
+  if (refreshCallback) {
+    pendingRefreshPromise = refreshCallback().finally(() => {
+      pendingRefreshPromise = null;
+    });
+    return pendingRefreshPromise;
+  }
 
-      if (!response.ok) {
-        deleteCookie("accessToken");
-        deleteCookie("refreshToken");
-        return false;
-      }
-
-      const session: AuthSession = await response.json();
-      setCookie("accessToken", session.accessToken, session.expiresIn);
-      setCookie("refreshToken", session.refreshToken, 60 * 60 * 24 * 7);
-      return true;
-    } catch {
-      deleteCookie("accessToken");
-      deleteCookie("refreshToken");
-      return false;
-    } finally {
-      refreshPromise = null;
-    }
-  })();
-
-  return refreshPromise;
+  // Fallback: no callback registered, return false
+  return false;
 }
 
 function getAuthToken(): string | null {
   return getCookie("accessToken");
 }
 
-function handleResponse<T>(response: Response, skipRedirect = false): Promise<T> {
+export interface RequestConfig extends RequestInit {
+  headers?: Record<string, string>;
+  params?: Record<string, string | number | boolean | undefined | null>;
+  skipAuth?: boolean;
+  skipRedirectOn401?: boolean;
+}
+
+function buildUrl(
+  endpoint: string,
+  params?: Record<string, string | number | boolean | undefined | null>
+): string {
+  const url = `${API_BASE_URL}${endpoint}`;
+  if (!params) return url;
+
+  const searchParams = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      searchParams.append(key, String(value));
+    }
+  });
+
+  const queryString = searchParams.toString();
+  return queryString ? `${url}?${queryString}` : url;
+}
+
+async function handleResponse<T>(response: Response, skipRedirect = false): Promise<T> {
   return new Promise((resolve, reject) => {
     if (!response.ok) {
       if (response.status === 401 && !skipRedirect && typeof window !== "undefined") {
@@ -148,31 +156,6 @@ function handleResponse<T>(response: Response, skipRedirect = false): Promise<T>
   });
 }
 
-export interface RequestConfig extends RequestInit {
-  headers?: Record<string, string>;
-  params?: Record<string, string | number | boolean | undefined | null>;
-  skipAuth?: boolean;
-  skipRedirectOn401?: boolean;
-}
-
-function buildUrl(
-  endpoint: string,
-  params?: Record<string, string | number | boolean | undefined | null>
-): string {
-  const url = `${API_BASE_URL}${endpoint}`;
-  if (!params) return url;
-
-  const searchParams = new URLSearchParams();
-  Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined && value !== null) {
-      searchParams.append(key, String(value));
-    }
-  });
-
-  const queryString = searchParams.toString();
-  return queryString ? `${url}?${queryString}` : url;
-}
-
 async function request<T>(endpoint: string, config: RequestConfig = {}): Promise<T> {
   const { params, headers, skipAuth, skipRedirectOn401, ...rest } = config;
 
@@ -196,7 +179,7 @@ async function request<T>(endpoint: string, config: RequestConfig = {}): Promise
     });
 
     if (response.status === 401 && !isRetry && !skipAuth) {
-      const refreshed = await refreshAccessToken();
+      const refreshed = await doRefresh();
       if (refreshed) {
         return doRequest(getAuthToken(), true);
       }

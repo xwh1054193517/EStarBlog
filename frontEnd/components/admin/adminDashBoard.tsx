@@ -1,8 +1,6 @@
-/**
- * 简洁的仪表盘统计组件
- */
+"use client";
 
-import { Card, CardContent } from "@/components/ui/card";
+import { useEffect, useState } from "react";
 import {
   FileText,
   FolderOpen,
@@ -15,6 +13,9 @@ import {
   Activity
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { getDashboardStats } from "@/lib/api/statsApi";
+import { getProfile } from "@/lib/api/authApi";
+import { AdminLoading } from "@/components/ui/loading";
 
 interface StatCardProps {
   title: string;
@@ -62,41 +63,52 @@ function calculateDays() {
   const startDate = new Date("2025-09-30");
   const targetDate = new Date("2026-03-05");
   const daysSinceStart = Math.floor((now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-  const daysUntilTarget = Math.floor(
-    (targetDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
-  );
 
-  return { daysSinceStart, daysUntilTarget };
-}
-
-function getStats() {
-  return {
-    totalPosts: 0,
-    publishedPosts: 0,
-    draftPosts: 0,
-    featuredPosts: 0,
-    totalCategories: 0,
-    totalTags: 0,
-    totalViews: 0,
-    recentPosts: [],
-    topViewedPosts: []
-  };
-}
-
-async function getUserInfo(userId: string) {
-  return { displayName: "博主", username: "user" };
+  return { daysSinceStart };
 }
 
 export default function adminDashBoard() {
-  const { daysSinceStart, daysUntilTarget } = calculateDays();
+  const { daysSinceStart } = calculateDays();
   const greeting = getGreeting();
-  const stats = getStats();
-  // 从数据库获取用户信息，确保获取到正确的displayName
-  let displayName = "博主";
 
-  // 计算发布率
+  const [stats, setStats] = useState({
+    postCount: 0,
+    publishedPostCount: 0,
+    draftPostCount: 0,
+    categoryCount: 0,
+    tagCount: 0,
+    onlineUsers: 0
+  });
+  const [displayName, setDisplayName] = useState("博主");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [dashboardStats, profile] = await Promise.all([getDashboardStats(), getProfile()]);
+
+        setStats(dashboardStats);
+        setDisplayName(profile.username || "博主");
+      } catch (error) {
+        console.error("Failed to fetch dashboard data:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, []);
+
   const publishRate =
-    stats.totalPosts > 0 ? Math.round((stats.publishedPosts / stats.totalPosts) * 100) : 0;
+    stats.postCount > 0 ? Math.round((stats.publishedPostCount / stats.postCount) * 100) : 0;
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <AdminLoading />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -118,16 +130,7 @@ export default function adminDashBoard() {
                 <div className="text-3xl font-bold">{daysSinceStart}</div>
                 <div className="text-xs opacity-70 mt-1">天</div>
               </div>
-
-              <div className="bg-white/10 dark:bg-black/10 backdrop-blur-sm rounded-xl p-4">
-                <div className="flex items-center space-x-2 mb-2">
-                  <Clock className="h-5 w-5" />
-                  <span className="text-sm font-medium">距离目标</span>
-                </div>
-                <div className="text-3xl font-bold">{daysUntilTarget}</div>
-                <div className="text-xs opacity-70 mt-1">天</div>
               </div>
-            </div>
           </div>
 
           <div className="hidden lg:block">
@@ -142,23 +145,23 @@ export default function adminDashBoard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
           title="全部文章"
-          value={stats.totalPosts}
-          description={`${stats.publishedPosts} 已发布 · ${stats.draftPosts} 草稿`}
+          value={stats.postCount}
+          description={`${stats.publishedPostCount} 已发布 · ${stats.draftPostCount} 草稿`}
           icon={<FileText className="h-6 w-6 text-white dark:text-black" />}
           gradient="bg-black dark:bg-white"
         />
 
         <StatCard
-          title="总浏览量"
-          value={stats.totalViews}
-          description="所有文章的浏览次数"
+          title="在线用户"
+          value={stats.onlineUsers}
+          description="当前在线用户数"
           icon={<Eye className="h-6 w-6 text-white dark:text-black" />}
           gradient="bg-black dark:bg-white"
         />
 
         <StatCard
           title="分类"
-          value={stats.totalCategories}
+          value={stats.categoryCount}
           description="内容分类数量"
           icon={<FolderOpen className="h-6 w-6 text-white dark:text-black" />}
           gradient="bg-black dark:bg-white"
@@ -166,7 +169,7 @@ export default function adminDashBoard() {
 
         <StatCard
           title="标签"
-          value={stats.totalTags}
+          value={stats.tagCount}
           description="文章标签数量"
           icon={<Tags className="h-6 w-6 text-white dark:text-black" />}
           gradient="bg-black dark:bg-white"
@@ -187,7 +190,7 @@ export default function adminDashBoard() {
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm text-gray-600 dark:text-gray-400">已发布文章</span>
                 <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                  {stats.publishedPosts} / {stats.totalPosts}
+                  {stats.publishedPostCount} / {stats.postCount}
                 </span>
               </div>
               <Progress value={publishRate} className="h-2" />
@@ -199,21 +202,21 @@ export default function adminDashBoard() {
             <div className="grid grid-cols-3 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
               <div className="text-center">
                 <div className="text-2xl font-bold text-black dark:text-white">
-                  {stats.publishedPosts}
+                  {stats.publishedPostCount}
                 </div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">已发布</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-gray-600 dark:text-gray-400">
-                  {stats.draftPosts}
+                  {stats.draftPostCount}
                 </div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">草稿</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-gray-400 dark:text-gray-500">
-                  {stats.featuredPosts}
+                  {stats.postCount - stats.publishedPostCount - stats.draftPostCount}
                 </div>
-                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">精选</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">其他</div>
               </div>
             </div>
           </div>
@@ -232,12 +235,10 @@ export default function adminDashBoard() {
                 <div className="w-10 h-10 bg-gray-200 dark:bg-gray-600 rounded-lg flex items-center justify-center">
                   <FileText className="h-5 w-5 text-black dark:text-white" />
                 </div>
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  平均浏览量
-                </span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">发布率</span>
               </div>
               <span className="text-lg font-bold text-gray-900 dark:text-gray-100">
-                {stats.publishedPosts > 0 ? Math.round(stats.totalViews / stats.publishedPosts) : 0}
+                {publishRate}%
               </span>
             </div>
 
@@ -251,9 +252,7 @@ export default function adminDashBoard() {
                 </span>
               </div>
               <span className="text-lg font-bold text-gray-900 dark:text-gray-100">
-                {stats.totalCategories > 0
-                  ? Math.round(stats.totalPosts / stats.totalCategories)
-                  : 0}
+                {stats.categoryCount > 0 ? Math.round(stats.postCount / stats.categoryCount) : 0}
               </span>
             </div>
 
@@ -263,86 +262,13 @@ export default function adminDashBoard() {
                   <Tags className="h-5 w-5 text-black dark:text-white" />
                 </div>
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  每文章标签数
+                  每标签文章数
                 </span>
               </div>
               <span className="text-lg font-bold text-gray-900 dark:text-gray-100">
-                {stats.totalPosts > 0 ? (stats.totalTags / stats.totalPosts).toFixed(1) : 0}
+                {stats.postCount > 0 ? (stats.tagCount / stats.postCount).toFixed(1) : 0}
               </span>
             </div>
-          </div>
-        </div>
-      </div>
-
-      {/* 最近文章和热门文章 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* 最近文章 */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">最近文章</h3>
-          <div className="space-y-3">
-            {stats.recentPosts.length > 0 ? (
-              stats.recentPosts.map((post) => (
-                <div
-                  key={post.id}
-                  className="flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg transition-colors"
-                >
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-                      {post.title}
-                    </div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      {new Date(post.createdAt).toLocaleDateString("zh-CN")}
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2 ml-4">
-                    <Eye className="h-4 w-4 text-gray-400" />
-                    <span className="text-sm text-gray-600 dark:text-gray-400">{post.views}</span>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="text-center py-8 text-gray-500 dark:text-gray-400">暂无文章</div>
-            )}
-          </div>
-        </div>
-
-        {/* 热门文章 */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">热门文章</h3>
-          <div className="space-y-3">
-            {stats.topViewedPosts.length > 0 ? (
-              stats.topViewedPosts.map((post, index) => (
-                <div
-                  key={post.id}
-                  className="flex items-center space-x-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg transition-colors"
-                >
-                  <div
-                    className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm ${
-                      index === 0
-                        ? "bg-black dark:bg-white text-white dark:text-black"
-                        : index === 1
-                          ? "bg-gray-600 text-white"
-                          : index === 2
-                            ? "bg-gray-400 text-white"
-                            : "bg-gray-100 dark:bg-gray-700 text-gray-500"
-                    }`}
-                  >
-                    {index + 1}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-                      {post.title}
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-1 text-sm font-semibold text-black dark:text-white">
-                    <Eye className="h-4 w-4" />
-                    <span>{post.views.toLocaleString()}</span>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="text-center py-8 text-gray-500 dark:text-gray-400">暂无数据</div>
-            )}
           </div>
         </div>
       </div>

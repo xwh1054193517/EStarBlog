@@ -13,7 +13,6 @@ export default function HomePageClient({ articles }: HomePageClientProps) {
     containerSelector: "#post-list",
     columns: 2,
     gap: 16,
-    waitForImages: false,
     debounceDelay: 50,
     breakpoints: { mobile: 768, tablet: 1200 }
   });

@@ -32,9 +32,11 @@ export default function TagTable({ onEdit, onCreate, onTagDeleted }: UnifiedTags
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["tags", page, pageSize, searchQuery],
-    queryFn: () => getTags({ page, pageSize, search: searchQuery || undefined })
+    queryFn: () => getTags({ page, pageSize, search: searchQuery || undefined }),
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: true
   });
-  console.log(data);
   const tags: Tag[] = data?.data || [];
   const total = data?.total || 0;
   const totalPages = data?.totalPages || 0;
@@ -197,6 +199,7 @@ export default function TagTable({ onEdit, onCreate, onTagDeleted }: UnifiedTags
         searchable={true}
         searchPlaceholder="搜索标签名称..."
         onSearch={handleSearch}
+        onForceRefresh={() => refetch()}
         selectable={true}
         selectedIds={selectedIds}
         onSelectionChange={setSelectedIds}

@@ -38,7 +38,10 @@ export default function CategoryTable({
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["categories", page, pageSize, searchQuery],
-    queryFn: () => getCategories({ page, pageSize, search: searchQuery || undefined })
+    queryFn: () => getCategories({ page, pageSize, search: searchQuery || undefined }),
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: true
   });
 
   const categories: Category[] = data?.data || [];
@@ -190,6 +193,7 @@ export default function CategoryTable({
         searchable={true}
         searchPlaceholder="搜索分类名称..."
         onSearch={handleSearch}
+        onForceRefresh={() => refetch()}
         selectable={true}
         selectedIds={selectedIds}
         onSelectionChange={setSelectedIds}

@@ -77,12 +77,12 @@ export default function ArticleContent({ content }: ArticleContentProps) {
 
   const components: Components = useMemo(
     () => ({
-      img: ({ src, alt }: { src?: string; alt?: string }) => (
+      img: ({ src, alt }) => (
         <img
-          src={src}
+          src={src as string}
           alt={alt || ""}
           style={{ cursor: "zoom-in" }}
-          onClick={() => openZoom(src || "", alt || "")}
+          onClick={() => openZoom((src as string) || "", alt || "")}
         />
       )
     }),

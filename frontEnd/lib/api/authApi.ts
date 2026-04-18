@@ -5,10 +5,10 @@ export async function login(username: string, password: string): Promise<AuthSes
   const session = await api.post<AuthSession>(
     "/auth/sessions",
     { username, password },
-    { skipRedirectOn401: true }
+    { skipAuth: true, skipRedirectOn401: true }
   );
-  setCookie("accessToken", session.accessToken, session.expiresIn);
-  setCookie("refreshToken", session.refreshToken, 60 * 60 * 24 * 7);
+  setCookie("accessToken", session.accessToken);
+  setCookie("refreshToken", session.refreshToken);
   return session;
 }
 

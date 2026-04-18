@@ -4,16 +4,16 @@
  * 标签管理页面
  */
 
+import { useEffect, useState } from "react";
 import ModernAdminLayout from "@/components/admin/modernAdminLayout";
-import { useState } from "react";
 import TagTable from "@/components/admin/tag-table";
 import TagModal from "@/components/admin/tag-modal";
 
 interface Tag {
-  id: number;
+  id: string;
   name: string;
   slug: string;
-  color?: String;
+  color?: string;
 }
 
 export default function TagList() {
@@ -34,7 +34,6 @@ export default function TagList() {
     setShowDialog(false);
     setEditingTag(null);
   };
-
   return (
     <ModernAdminLayout>
       <div className="space-y-4">
