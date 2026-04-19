@@ -13,6 +13,7 @@ import { RedisModule } from './redis/redis.module';
 import { StatsModule } from './modules/stats/stats.module';
 import { TagsModule } from './modules/tags/tags.module';
 import { UploadsModule } from './modules/uploads/uploads.module';
+import { SiteConfigModule } from './modules/site-config/site-config.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { UploadsModule } from './modules/uploads/uploads.module';
     StatsModule,
     UploadsModule,
     ProfileModule,
+    SiteConfigModule,
   ],
   controllers: [HealthController],
   providers: [RolesGuard],
