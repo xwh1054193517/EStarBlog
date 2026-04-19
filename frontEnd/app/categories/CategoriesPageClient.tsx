@@ -17,7 +17,7 @@ export default function CategoriesPageClient({ categories, siteData }: Categorie
         <div className="category-lists">
           <ul className="category-list">
             {categories.map((category) => (
-              <li key={category.id} className="category-list-item">
+              <li key={category.slug} className="category-list-item">
                 <Link href={category.url} className="category-list-link">
                   {category.name}
                 </Link>

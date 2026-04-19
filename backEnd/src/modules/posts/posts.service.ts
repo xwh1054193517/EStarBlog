@@ -37,6 +37,37 @@ export class PostsService {
     return this.listPosts(query, true);
   }
 
+  async getArchives() {
+    const posts = await this.prisma.post.findMany({
+      where: { published: true, publishedAt: { not: null } },
+      select: { publishedAt: true },
+      orderBy: { publishedAt: 'desc' },
+    });
+
+    const archiveMap = new Map<string, number>();
+    for (const post of posts) {
+      if (post.publishedAt) {
+        const date = new Date(post.publishedAt);
+        const year = date.getFullYear().toString();
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const key = `${year}-${month}`;
+        archiveMap.set(key, (archiveMap.get(key) || 0) + 1);
+      }
+    }
+
+    const archives = Array.from(archiveMap.entries())
+      .map(([key, count]) => {
+        const [year, month] = key.split('-');
+        return { year, month, count };
+      })
+      .sort((a, b) => {
+        if (a.year !== b.year) return b.year.localeCompare(a.year);
+        return b.month.localeCompare(a.month);
+      });
+
+    return archives;
+  }
+
   async findPublicBySlug(slug: string) {
     const post = await this.prisma.post.findFirst({
       where: { slug, published: true },
@@ -208,14 +239,14 @@ export class PostsService {
 
     if (query.category && !categoryId) {
       const category = await this.prisma.category.findUnique({
-        where: { slug: query.category }
+        where: { slug: query.category },
       });
       categoryId = category?.id;
     }
 
     if (query.tag && !tagId) {
       const tag = await this.prisma.tag.findUnique({
-        where: { slug: query.tag }
+        where: { slug: query.tag },
       });
       tagId = tag?.id;
     }

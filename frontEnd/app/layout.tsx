@@ -27,12 +27,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="zh-CN"
-      data-theme="light"
-      data-scroll-behavior="smooth"
-      suppressHydrationWarning
-    >
+    <html lang="zh-CN" data-theme="dark" data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         {/* 中性风格图标 自适应 */}
         <link

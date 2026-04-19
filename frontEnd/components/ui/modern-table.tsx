@@ -22,22 +22,27 @@ import {
   type TableFilterValue
 } from "@/components/ui/table-filter";
 import { Card, CardContent } from "@/components/ui/card";
-import { AdminLoading, AdminLoadingOverlay } from "@/components/ui/loading";
+import { AdminLoading } from "@/components/ui/loading";
 import { DeleteConfirmDialog } from "@/components/ui/confirm-dialog";
 type TableFilters = Record<string, TableFilterValue>;
+// 列筛选器
 interface ColumnFilter {
   type: TableFilterType;
   options?: TableFilterOption[];
   placeholder?: string;
 }
+// 列
 interface TableColumn<T> {
   key: string;
   title: string;
   width?: string;
   className?: string;
+  // 渲染函数
   render?: (value: unknown, record: T) => ReactNode;
   filter?: ColumnFilter;
 }
+
+// 操作列
 interface TableAction<T> {
   key: string;
   label: string | ((value: T) => string);
@@ -46,26 +51,42 @@ interface TableAction<T> {
   className?: string;
   variant?: ActionVariant | ((value: T) => ActionVariant);
 }
+// 表格属性
 interface TableProps<T> {
+  // 数据
   data: T[];
   columns: TableColumn<T>[];
+
+  // 状态
   loading?: boolean;
   error?: string | null;
+
+  // 搜索
   searchable?: boolean;
   searchPlaceholder?: string;
   onSearch?: (query: string) => void;
+
+  // 筛选
   filterable?: boolean;
   onFilterChange?: (filters: TableFilters) => void;
+
+  // 选择
   selectable?: boolean;
   selectedIds?: string[];
   onSelectionChange?: (selectedIds: string[]) => void;
+
+  // 操作
   actions?: TableAction<T>[];
+
+  // 新建按钮
   createButton?: {
     label: string;
     href?: ComponentProps<typeof Link>["href"];
     onClick?: () => void;
     icon?: ReactNode;
   };
+
+  // 批量操作
   batchActions?: Array<{
     label: string;
     onClick: (selectedIds: string[]) => void;
@@ -73,6 +94,11 @@ interface TableProps<T> {
     icon?: ReactNode;
     disabled?: boolean;
   }>;
+
+  // 强制刷新
+  onForceRefresh?: () => void;
+
+  // 分页
   pagination?: {
     page: number;
     pageSize: number;
@@ -80,12 +106,17 @@ interface TableProps<T> {
     totalPages: number;
     onPageChange: (page: number) => void;
   };
+
+  // 样式
   emptyIcon?: ReactNode;
   emptyTitle?: string;
   emptyDescription?: string;
+
+  // 获取记录ID的函数
   getRecordId: (record: T) => string;
+
+  // 重试函数
   onRetry?: () => void;
-  onForceRefresh?: () => void;
 }
 
 export function ModernTable<T = unknown>({
@@ -109,13 +140,18 @@ export function ModernTable<T = unknown>({
   emptyTitle = "暂无数据",
   emptyDescription = "不存在相关数据",
   getRecordId,
-  onRetry,
-  onForceRefresh
+  onRetry
 }: TableProps<T>) {
+  // 搜索查询
   const [searchQuery, setSearchQuery] = useState("");
+  // 删除记录
   const [deleteRecord, setDeleteRecord] = useState<T | null>(null);
+  // 删除操作
   const [deleteAction, setDeleteAction] = useState<TableAction<T> | null>(null);
+
+  // 筛选
   const [filters, setFilters] = useState<TableFilters>({});
+  // 筛选弹窗
   const [openPopovers, setOpenPopovers] = useState<Record<string, boolean>>({});
 
   const handleSearch = (query: string) => {
@@ -124,7 +160,6 @@ export function ModernTable<T = unknown>({
 
   const submitSearch = () => {
     onSearch?.(searchQuery);
-    onForceRefresh?.();
   };
 
   const handleFilterChange = (columnKey: string, value: TableFilterValue) => {
@@ -161,6 +196,7 @@ export function ModernTable<T = unknown>({
     onSelectionChange?.(newSelection);
   };
 
+  // 解析操作列的变体
   const resolveActionVariant = (action: TableAction<T>, record: T): ActionVariant => {
     if (typeof action.variant === "function") {
       return action.variant(record);
@@ -185,11 +221,14 @@ export function ModernTable<T = unknown>({
     }
   };
 
-  const showTableLoading = loading;
+  // 加载状态（仅表格区域）
+  const showTableLoading = loading && data.length === 0;
+  // 错误状态
   const showTableError = error && data.length === 0;
 
   return (
     <div className="space-y-6">
+      {/* 搜索和操作栏 - 始终显示，不受 loading 影响 */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         {searchable && (
           <div className="relative flex-1 max-w-md flex items-center gap-2">
@@ -217,6 +256,7 @@ export function ModernTable<T = unknown>({
         )}
 
         <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto sm:flex-nowrap justify-end sm:justify-normal">
+          {/* 批量操作区域 */}
           {selectable && batchActions.length > 0 && selectedIds.length > 0 && (
             <div
               className={cn(
@@ -255,6 +295,7 @@ export function ModernTable<T = unknown>({
             </div>
           )}
 
+          {/* 新建按钮 */}
           {createButton &&
             (createButton.href ? (
               <Link href={createButton.href} className="shrink-0">
@@ -275,8 +316,10 @@ export function ModernTable<T = unknown>({
         </div>
       </div>
 
+      {/* 表格内容区域 */}
       <div className="space-y-4">
-        {showTableLoading && data.length === 0 && (
+        {/* 加载状态 */}
+        {showTableLoading && (
           <Card>
             <CardContent className="py-20">
               <AdminLoading text="正在加载数据..." />
@@ -284,6 +327,7 @@ export function ModernTable<T = unknown>({
           </Card>
         )}
 
+        {/* 错误状态 */}
         {showTableError && (
           <Card>
             <CardContent className="text-center py-12">
@@ -304,6 +348,7 @@ export function ModernTable<T = unknown>({
           </Card>
         )}
 
+        {/* 空状态 */}
         {!showTableLoading &&
           !showTableError &&
           data.length === 0 &&
@@ -324,10 +369,12 @@ export function ModernTable<T = unknown>({
             </Card>
           )}
 
-        {!showTableError && (data.length > 0 || filterable || Object.keys(filters).length > 0) && (
-          <div className="relative">
-            {showTableLoading && data.length > 0 && <AdminLoadingOverlay />}
+        {/* 表格 */}
+        {!showTableLoading &&
+          !showTableError &&
+          (data.length > 0 || filterable || Object.keys(filters).length > 0) && (
             <>
+              {/* 表头 */}
               <div className="space-y-2">
                 <div className="flex items-center space-x-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300">
                   {selectable && (
@@ -371,6 +418,7 @@ export function ModernTable<T = unknown>({
                 </div>
               </div>
 
+              {/* 数据行 */}
               {data.length === 0 ? (
                 <Card>
                   <CardContent className="text-center py-8">
@@ -475,10 +523,10 @@ export function ModernTable<T = unknown>({
                 })
               )}
             </>
-          </div>
-        )}
+          )}
       </div>
 
+      {/* 分页 */}
       {pagination && pagination.totalPages > 1 && (
         <div className="flex items-center justify-between px-4">
           <div className="text-sm text-gray-600 dark:text-gray-400">
@@ -507,6 +555,7 @@ export function ModernTable<T = unknown>({
         </div>
       )}
 
+      {/* 删除确认对话框 */}
       <DeleteConfirmDialog
         open={!!deleteRecord}
         onClose={() => {

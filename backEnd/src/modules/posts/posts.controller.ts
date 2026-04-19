@@ -40,6 +40,12 @@ export class PostsController {
     return this.postsService.listPublic(query);
   }
 
+  @Get('posts/archives')
+  @ApiOperation({ summary: 'Get post archives by year and month' })
+  getArchives() {
+    return this.postsService.getArchives();
+  }
+
   @Get('posts/:slug')
   @ApiOperation({ summary: 'Get public post detail' })
   @ApiOkResponse({ type: PostEntity })

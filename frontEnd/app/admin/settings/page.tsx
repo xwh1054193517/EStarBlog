@@ -96,16 +96,16 @@ export default function SettingsPage() {
       <div className="space-y-6">
         <div className="flex items-center space-x-2">
           <div className="w-1 h-6 bg-gradient-to-b from-blue-600 to-cyan-600 rounded-full" />
-          <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">站点设置</h1>
+          <h1 className="text-xl font-semibold text-gray-900">站点设置</h1>
         </div>
 
-        <div className="flex space-x-4 border-b border-gray-200 dark:border-gray-700 pb-4">
+        <div className="flex space-x-4 border-b border-gray-200 pb-4">
           <button
             onClick={() => setActiveTab("blog")}
             className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
               activeTab === "blog"
-                ? "bg-black dark:bg-white text-white dark:text-black"
-                : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+                ? "bg-white text-black"
+                : "text-gray-600 hover:text-gray-900"
             }`}
           >
             博客配置
@@ -114,8 +114,8 @@ export default function SettingsPage() {
             onClick={() => setActiveTab("basic")}
             className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
               activeTab === "basic"
-                ? "bg-black dark:bg-white text-white dark:text-black"
-                : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+                ? "bg-white text-black"
+                : "text-gray-600 hover:text-gray-900"
             }`}
           >
             基础配置
@@ -130,7 +130,7 @@ export default function SettingsPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">
+                  <label className="text-sm font-medium text-gray-700 mb-1 block">
                     博客标题
                   </label>
                   <Input
@@ -140,7 +140,7 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">
+                  <label className="text-sm font-medium text-gray-700 mb-1 block">
                     副标题
                   </label>
                   <Input
@@ -150,7 +150,7 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">
+                  <label className="text-sm font-medium text-gray-700 mb-1 block">
                     建站日期
                   </label>
                   <Input
@@ -160,7 +160,7 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">
+                  <label className="text-sm font-medium text-gray-700 mb-1 block">
                     公告内容 (HTML)
                   </label>
                   <Textarea
@@ -207,7 +207,7 @@ export default function SettingsPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">
+                  <label className="text-sm font-medium text-gray-700 mb-1 block">
                     博主名称
                   </label>
                   <Input
@@ -217,7 +217,7 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">
+                  <label className="text-sm font-medium text-gray-700 mb-1 block">
                     博主简介
                   </label>
                   <Textarea
@@ -228,7 +228,7 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">
+                  <label className="text-sm font-medium text-gray-700 mb-1 block">
                     博主头像 URL
                   </label>
                   <Input
@@ -240,7 +240,7 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">
+                  <label className="text-sm font-medium text-gray-700 mb-1 block">
                     主页 URL
                   </label>
                   <Input

@@ -10,7 +10,8 @@ interface ArticleSortListProps {
   total?: number;
 }
 
-const DEFAULT_COVER = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=400&q=80";
+const DEFAULT_COVER =
+  "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=400&q=80";
 
 function formatDate(dateString: string): string {
   const date = new Date(dateString);
@@ -66,46 +67,44 @@ export default function ArticleSortList({
         </div>
       )}
 
-      {groupByYear && groupedArticles ? (
-        groupedArticles.map((group) => (
-          <div key={group.year}>
-            <div className="article-sort-item year">{group.year}</div>
-            {group.articles.map((article) => (
-              <div key={article.id} className="article-sort-item">
-                <Link href={article.url} className="article-sort-item-img">
-                  <img src={article.cover || DEFAULT_COVER} alt={article.title} loading="lazy" />
-                </Link>
-                <div className="article-sort-item-info">
-                  <div className="article-sort-item-time">
-                    <i className="ri-calendar-2-fill"></i>
-                    <span>{formatDate(article.publishTime)}</span>
-                  </div>
-                  <Link href={article.url} className="article-sort-item-title">
-                    {article.title}
+      {groupByYear && groupedArticles
+        ? groupedArticles.map((group) => (
+            <div key={group.year}>
+              <div className="article-sort-item year">{group.year}</div>
+              {group.articles.map((article) => (
+                <div key={article.slug} className="article-sort-item">
+                  <Link href={article.url} className="article-sort-item-img">
+                    <img src={article.cover || DEFAULT_COVER} alt={article.title} loading="lazy" />
                   </Link>
+                  <div className="article-sort-item-info">
+                    <div className="article-sort-item-time">
+                      <i className="ri-calendar-2-fill"></i>
+                      <span>{formatDate(article.publishTime)}</span>
+                    </div>
+                    <Link href={article.url} className="article-sort-item-title">
+                      {article.title}
+                    </Link>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        ))
-      ) : (
-        articles.map((article) => (
-          <div key={article.id} className="article-sort-item">
-            <Link href={article.url} className="article-sort-item-img">
-              <img src={article.cover || DEFAULT_COVER} alt={article.title} loading="lazy" />
-            </Link>
-            <div className="article-sort-item-info">
-              <div className="article-sort-item-time">
-                <i className="ri-calendar-2-fill"></i>
-                <span>{formatDate(article.publishTime)}</span>
-              </div>
-              <Link href={article.url} className="article-sort-item-title">
-                {article.title}
-              </Link>
+              ))}
             </div>
-          </div>
-        ))
-      )}
+          ))
+        : articles.map((article) => (
+            <div key={article.id} className="article-sort-item">
+              <Link href={article.url} className="article-sort-item-img">
+                <img src={article.cover || DEFAULT_COVER} alt={article.title} loading="lazy" />
+              </Link>
+              <div className="article-sort-item-info">
+                <div className="article-sort-item-time">
+                  <i className="ri-calendar-2-fill"></i>
+                  <span>{formatDate(article.publishTime)}</span>
+                </div>
+                <Link href={article.url} className="article-sort-item-title">
+                  {article.title}
+                </Link>
+              </div>
+            </div>
+          ))}
     </div>
   );
 }

@@ -13,7 +13,7 @@
 :root,
 [data-theme="light"] {
   --radius: 0.5rem;
-  --estar-theme: #4facfe;
+  --estar-theme: #3781c2;
   --estar-theme-hover: #00c6fb;
   --estar-font: #4c4948;
   --estar-font-light: #ffffff;
@@ -34,7 +34,7 @@
   --estar-footer-icon-bg-hover: #4c4948;
   --estar-footer-font: #121212;
   --estar-footer-font-hover: #ffffff;
-  --estar-footer-font-bg-hover: rgba(73, 177, 245, 0.7);
+  --estar-footer-font-bg-hover: rgba(80, 177, 241, 0.7);
   --estar-radius-sm: 8px;
   --estar-radius-md: 12px;
   --estar-radius-lg: 16px;
@@ -63,8 +63,8 @@
 
 [data-theme="dark"] {
   --radius: 0.5rem;
-  --estar-theme: #4facfe;
-  --estar-theme-hover: #00c6fb;
+  --estar-theme: #3da3f7;
+  --estar-theme-hover: #62d4f3;
   --estar-font: rgba(255, 255, 255, 0.8);
   --estar-font-light: rgba(255, 255, 255, 0.8);
   --estar-meta: rgba(255, 255, 255, 0.6);
@@ -107,7 +107,7 @@
   --ring: 0 0% 83.1%;
 }
 
-@theme {
+/* @theme {
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
   --color-card: hsl(var(--card));
@@ -130,7 +130,7 @@
   --radius-sm: var(--radius);
   --radius-md: calc(var(--radius) + 2px);
   --radius-lg: var(--radius);
-}
+} */
 
 @layer base {
   * {

@@ -24,7 +24,7 @@ export default function PostList({ articles, onWaterfallReady }: PostListProps) 
   return (
     <div id="post-list">
       {articles.map((article) => (
-        <div key={article.id} className="post-items">
+        <div key={article.slug} className="post-items">
           {(article.isTop || article.isEssence) && (
             <div className="post-badge">
               {article.isTop && <span className="badge-top">置顶</span>}
@@ -59,7 +59,7 @@ export default function PostList({ articles, onWaterfallReady }: PostListProps) 
               {article.tags && article.tags.length > 0 && (
                 <span className="article-meta tags">
                   {article.tags.map((tag, index) => (
-                    <span key={tag.id}>
+                    <span key={`${tag.id}-${index}`}>
                       {index > 0 && <span className="article-meta-link">•</span>}
                       <i className="ri-price-tag-3-fill"></i>
                       <Link className="article-meta__tags" href={tag.url}>

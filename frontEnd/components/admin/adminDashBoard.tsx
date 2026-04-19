@@ -130,7 +130,7 @@ export default function adminDashBoard() {
                 <div className="text-3xl font-bold">{daysSinceStart}</div>
                 <div className="text-xs opacity-70 mt-1">天</div>
               </div>
-              </div>
+            </div>
           </div>
 
           <div className="hidden lg:block">

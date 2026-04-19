@@ -40,11 +40,11 @@ export default function TagList() {
         {/* 标题 */}
         <div className="flex items-center space-x-2">
           <div className="w-1 h-6 bg-gradient-to-b from-red-600 to-orange-600 rounded-full"></div>
-          <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">标签列表</h1>
+          <h1 className="text-xl font-semibold text-gray-900">标签列表</h1>
         </div>
 
         {/* 标签列表 */}
-        <div className="bg-white dark:bg-gray-800 p-4 rounded-md shadow-md border border-gray-200 dark:border-gray-700">
+        <div className="bg-white rounded-md shadow-md border border-gray-200 p-4">
           <TagTable onEdit={handleEdit} onCreate={handleCreate} />
         </div>
         {/* 创建/编辑对话框 */}
