@@ -1,4 +1,4 @@
-import { IsOptional, IsString, IsObject } from "class-validator";
+import { IsOptional, IsString, IsObject } from 'class-validator';
 
 export class UpdateBlogConfigDto {
   @IsOptional()
@@ -20,16 +20,4 @@ export class UpdateBlogConfigDto {
   @IsOptional()
   @IsString()
   established?: string;
-
-  @IsOptional()
-  @IsObject({ each: true })
-  sidebarSocial?: Array<{ name: string; url: string; icon: string }>;
-
-  @IsOptional()
-  @IsObject({ each: true })
-  footerSocial?: Array<{ name: string; url: string; icon: string; position?: string }>;
-
-  @IsOptional()
-  @IsObject({ each: true })
-  footerLinks?: Array<{ name: string; url: string }>;
 }

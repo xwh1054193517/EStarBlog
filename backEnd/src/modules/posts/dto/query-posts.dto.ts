@@ -21,6 +21,16 @@ export class QueryPostsDto extends PaginationQueryDto {
 
   @ApiPropertyOptional()
   @IsOptional()
+  @IsString()
+  category?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  tag?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
   @Type(() => Boolean)
   @IsBoolean()
   published?: boolean;

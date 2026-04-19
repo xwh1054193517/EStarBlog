@@ -202,6 +202,24 @@ export class PostsService {
   private async listPosts(query: QueryPostsDto, includeDrafts: boolean) {
     const page = query.page ?? 1;
     const pageSize = query.pageSize ?? 10;
+
+    let categoryId = query.categoryId;
+    let tagId = query.tagId;
+
+    if (query.category && !categoryId) {
+      const category = await this.prisma.category.findUnique({
+        where: { slug: query.category }
+      });
+      categoryId = category?.id;
+    }
+
+    if (query.tag && !tagId) {
+      const tag = await this.prisma.tag.findUnique({
+        where: { slug: query.tag }
+      });
+      tagId = tag?.id;
+    }
+
     const where: Prisma.PostWhereInput = {
       ...(includeDrafts
         ? query.published !== undefined
@@ -216,8 +234,8 @@ export class PostsService {
             ],
           }
         : {}),
-      ...(query.categoryId ? { categoryId: query.categoryId } : {}),
-      ...(query.tagId ? { tags: { some: { tagId: query.tagId } } } : {}),
+      ...(categoryId ? { categoryId } : {}),
+      ...(tagId ? { tags: { some: { tagId } } } : {}),
     };
     const [items, total] = await Promise.all([
       this.prisma.post.findMany({

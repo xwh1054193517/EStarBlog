@@ -1,17 +1,20 @@
-import { Injectable } from "@nestjs/common";
-import { PrismaService } from "../../prisma/prisma.service";
-import { UpdateBlogConfigDto, UpdateBasicConfigDto } from "./dto";
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../../prisma/prisma.service';
+import { UpdateBlogConfigDto, UpdateBasicConfigDto } from './dto';
 
 @Injectable()
 export class SiteConfigService {
   constructor(private readonly prisma: PrismaService) {}
 
   private readonly CONFIG_KEYS = {
-    BLOG: "blog",
-    BASIC: "basic",
+    BLOG: 'blog',
+    BASIC: 'basic',
   } as const;
 
-  async getSiteConfig(): Promise<{ blog: Record<string, any>; basic: Record<string, any> }> {
+  async getSiteConfig(): Promise<{
+    blog: Record<string, any>;
+    basic: Record<string, any>;
+  }> {
     const [blogConfig, basicConfig] = await Promise.all([
       this.getBlogConfig(),
       this.getBasicConfig(),
@@ -55,7 +58,9 @@ export class SiteConfigService {
     }
   }
 
-  async updateBlogConfig(dto: UpdateBlogConfigDto): Promise<Record<string, any>> {
+  async updateBlogConfig(
+    dto: UpdateBlogConfigDto,
+  ): Promise<Record<string, any>> {
     const existing = await this.getBlogConfig();
     const updated = { ...existing, ...dto };
 
@@ -71,7 +76,9 @@ export class SiteConfigService {
     return updated;
   }
 
-  async updateBasicConfig(dto: UpdateBasicConfigDto): Promise<Record<string, any>> {
+  async updateBasicConfig(
+    dto: UpdateBasicConfigDto,
+  ): Promise<Record<string, any>> {
     const existing = await this.getBasicConfig();
     const updated = { ...existing, ...dto };
 
@@ -89,23 +96,20 @@ export class SiteConfigService {
 
   private getDefaultBlogConfig(): Record<string, any> {
     return {
-      title: "EstarBlog",
-      subtitle: "EternalStar",
-      typingTexts: ["记录生活思考", "收藏世界真知", "design to react"],
-      announcement: "",
-      established: "2024-01-01",
-      sidebarSocial: [],
-      footerSocial: [],
-      footerLinks: [],
+      title: 'EstarBlog',
+      subtitle: 'EternalStar',
+      typingTexts: ['记录生活思考', '收藏世界真知', 'design to react'],
+      announcement: '',
+      established: '2024-01-01',
     };
   }
 
   private getDefaultBasicConfig(): Record<string, any> {
     return {
-      author: "EternalStar",
-      authorDesc: "",
-      authorAvatar: "",
-      homeUrl: "",
+      author: 'EternalStar',
+      authorDesc: '',
+      authorAvatar: '',
+      homeUrl: '',
     };
   }
 }
