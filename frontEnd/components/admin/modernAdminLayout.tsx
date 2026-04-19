@@ -83,12 +83,6 @@ export default function ModernAdminLayout({ children }: ModernAdminLayoutProps) 
       current: pathname?.startsWith("/admin/images")
     },
     {
-      name: "个人信息",
-      href: "/admin/profile",
-      icon: User,
-      current: pathname?.startsWith("/admin/profile")
-    },
-    {
       name: "系统设置",
       href: "/admin/settings",
       icon: Settings,

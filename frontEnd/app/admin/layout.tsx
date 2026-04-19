@@ -10,5 +10,13 @@ export const metadata: Metadata = {
 };
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return (
+    <>
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css"
+      />
+      {children}
+    </>
+  );
 }

@@ -5,7 +5,9 @@ export default function AuthorCard({ siteData }: { siteData: SiteData }) {
   return (
     <div className="card-widget card-info">
       <div className="author-avatar">
-        <img src={siteData.basicConfig.authorAvatar} alt="头像" />
+        {siteData.basicConfig.authorAvatar && (
+          <img src={siteData.basicConfig.authorAvatar} alt="头像" />
+        )}
       </div>
       <div className="author-name">{siteData.basicConfig.author}</div>
       <div className="author-desc">{siteData.basicConfig.authorDesc}</div>

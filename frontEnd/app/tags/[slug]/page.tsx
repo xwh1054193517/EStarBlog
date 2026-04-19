@@ -1,7 +1,7 @@
 import { getMockSiteData } from "@/lib/mock-api";
-import TagPageClient from "./TagPageClient";
+import TagsDetailPageClient from "./TagsDetailPageClient";
 
-export default async function TagPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function TagsDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const siteData = await getMockSiteData();
 
@@ -16,5 +16,5 @@ export default async function TagPage({ params }: { params: Promise<{ slug: stri
     );
   }
 
-  return <TagPageClient slug={slug} tag={tag} siteData={siteData} />;
+  return <TagsDetailPageClient slug={slug} tag={tag} siteData={siteData} />;
 }

@@ -1,7 +1,7 @@
 import { getMockSiteData } from "@/lib/mock-api";
 import CategoryPageClient from "./CategoryPageClient";
 
-export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function CategoriesDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const siteData = await getMockSiteData();
 

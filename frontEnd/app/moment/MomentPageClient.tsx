@@ -110,7 +110,9 @@ export default function MomentPageClient({ moments, siteData }: MomentPageClient
               <div key={moment.id} className={`moment-item ${isLayoutReady ? "layout-ready" : ""}`}>
                 <div className="moment-header">
                   <div className="moment-avatar">
-                    <img src={basicConfig.authorAvatar} alt="avatar" loading="lazy" />
+                    {basicConfig.authorAvatar && (
+                      <img src={basicConfig.authorAvatar} alt="avatar" loading="lazy" />
+                    )}
                   </div>
                   <div className="moment-meta">
                     <div className="moment-author">{basicConfig.author}</div>
@@ -122,27 +124,27 @@ export default function MomentPageClient({ moments, siteData }: MomentPageClient
                   {moment.content.text && <div className="moment-text">{moment.content.text}</div>}
 
                   {moment.content.images && moment.content.images.length > 0 && (
-                      <div
-                        className={`moment-images images-${Math.min(moment.content.images.length, 6)}`}
-                      >
-                        {moment.content.images.slice(0, 6).map((image, index) => (
-                          <div key={index} className="image-item">
-                            <img
-                              src={image}
-                              alt={`图片 ${index + 1}`}
-                              loading="lazy"
-                              onClick={handleImageClick}
-                            />
-                            {index === 5 && moment.content.images!.length > 6 && (
-                              <div className="more-images-overlay">
-                                <i className="ri-image-line"></i>
-                                <span>+{moment.content.images!.length - 6}</span>
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                    <div
+                      className={`moment-images images-${Math.min(moment.content.images.length, 6)}`}
+                    >
+                      {moment.content.images.slice(0, 6).map((image, index) => (
+                        <div key={index} className="image-item">
+                          <img
+                            src={image}
+                            alt={`图片 ${index + 1}`}
+                            loading="lazy"
+                            onClick={handleImageClick}
+                          />
+                          {index === 5 && moment.content.images!.length > 6 && (
+                            <div className="more-images-overlay">
+                              <i className="ri-image-line"></i>
+                              <span>+{moment.content.images!.length - 6}</span>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
 
                   {moment.content.video && (
                     <div className="moment-video">

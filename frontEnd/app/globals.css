@@ -174,8 +174,7 @@ body {
   z-index: -50;
   background:
     linear-gradient(rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.24)),
-    url("https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=80")
-      center / cover fixed;
+    url("https://eternalstar.xyz/files/blog/wraith.jpg") center / cover fixed;
 }
 [data-theme="dark"] .web_bg::before {
   position: absolute;
@@ -189,6 +188,12 @@ a {
   text-decoration: none;
 }
 
+.tag-list {
+  justify-content: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
 /* button {
   border: 0;
   padding: 0;
@@ -533,6 +538,14 @@ ol {
   inset: 0;
   z-index: 120;
   background: rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.drawer-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .search-modal-overlay {
@@ -555,6 +568,12 @@ ol {
   overflow-y: auto;
   background: var(--estar-card-bg);
   box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+}
+
+.drawer-overlay.open .drawer-container {
+  transform: translateX(0);
 }
 
 .avatar-img {
@@ -1495,11 +1514,14 @@ post-infoText {
         display: flex;
         flex-direction: column;
         gap: 16px;
+        align-items: center;
+        justify-content: center;
         padding: 1rem;
         flex: 1;
 
         .bar-box-row {
-          display: flex;
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
           justify-content: space-between;
           gap: 16px;
         }

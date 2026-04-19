@@ -34,13 +34,13 @@ export default function MobileDrawer({
     );
   };
 
-  if (!open) return null;
-
   return (
-    <div className="drawer-overlay" onClick={onClose}>
+    <div className={`drawer-overlay${open ? " open" : ""}`} onClick={onClose}>
       <div className="drawer-container" onClick={(event) => event.stopPropagation()}>
         <div className="avatar-img">
-          <img src={siteData.basicConfig.authorAvatar} alt="avatar" />
+          {siteData.basicConfig.authorAvatar && (
+            <img src={siteData.basicConfig.authorAvatar} alt="avatar" />
+          )}
         </div>
 
         <div className="site-data">

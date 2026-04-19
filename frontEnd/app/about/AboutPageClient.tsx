@@ -31,12 +31,17 @@ export default function AboutPageClient({ siteData }: AboutPageClientProps) {
   const profileData = [
     { label: "职业", value: "前端开发者", color: "#885fb8" },
     { label: "位置", value: "广州", color: "#4298b4" },
-    { label: "目标", value: "全栈", color: "#56a178" }
+    { label: "目标", value: "全栈", color: "#56a178" },
+    { label: "技术", value: "vue + react", color: "#ee10eeff" },
+
+    { label: "性格", value: "INFJ", color: "#f0e003ff" },
+    { label: "年龄", value: "00", color: "#0cfafaff" }
   ];
 
   const versionsData = [
     { name: "ESBlog", version: "1.0" },
-    { name: "Next.js", version: "16.0" }
+    { name: "Next.js", version: "16.0" },
+    { name: "Nest.js", version: "x.x" }
   ];
 
   const socializeData = blogConfig.sidebarSocial || [];
@@ -64,7 +69,9 @@ export default function AboutPageClient({ siteData }: AboutPageClientProps) {
             </div>
           </div>
           <div className="PI-box-right">
-            <img src={basicConfig.authorAvatar} alt="个人照片" loading="lazy" />
+            {basicConfig.authorAvatar && (
+              <img src={basicConfig.authorAvatar} alt="个人照片" loading="lazy" />
+            )}
           </div>
         </div>
 
@@ -88,85 +95,6 @@ export default function AboutPageClient({ siteData }: AboutPageClientProps) {
                   </div>
                 ))}
               </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="Philosophical">
-          <div className="about-layout P-box-left">
-            <div className="tips">性格</div>
-            <div className="title">提倡者</div>
-            <div className="title" style={{ color: "#56a178" }}>
-              INFJ
-            </div>
-            <img
-              className="image"
-              src="https://www.16personalities.com/static/images/personality-types/avatars/infj-advocate.png"
-              alt="性格类型"
-              loading="lazy"
-            />
-            <div className="tips-bottom">
-              在{" "}
-              <a
-                href="https://www.16personalities.com/ch"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                16Personalities
-              </a>{" "}
-              了解关于{" "}
-              <a
-                href="https://www.16personalities.com/ch/infj-advocate"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                提倡者
-              </a>
-              &ensp;的更多信息
-            </div>
-          </div>
-          <div className="about-layout P-box-right">
-            <div className="tips">座右铭</div>
-            <span className="title" style={{ opacity: 0.6 }}>
-              代码改变世界
-            </span>
-            <span className="title">分享成就未来</span>
-          </div>
-        </div>
-
-        <div className="Platform">
-          <div className="about-layout Socialize">
-            <div className="tips">账号</div>
-            <div className="title">联系方式</div>
-            <div className="S-box">
-              {socializeData.map((item) => (
-                <a
-                  key={item.name}
-                  className="btn-layout"
-                  href={item.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {item.name}
-                </a>
-              ))}
-            </div>
-          </div>
-          <div className="about-layout Creation">
-            <div className="tips">订阅</div>
-            <div className="title">创作平台</div>
-            <div className="S-box">
-              {creationData.map((item) => (
-                <a
-                  key={item.name}
-                  className="btn-layout"
-                  href={item.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {item.name}
-                </a>
-              ))}
             </div>
           </div>
         </div>
@@ -197,7 +125,7 @@ export default function AboutPageClient({ siteData }: AboutPageClientProps) {
           </div>
         </div>
 
-        <div className="data">
+        {/* <div className="data">
           <div className="about-layout statistic">
             <div className="tips">浏览</div>
             <div className="title">访问统计</div>
@@ -227,7 +155,7 @@ export default function AboutPageClient({ siteData }: AboutPageClientProps) {
               更多统计
             </a>
           </div>
-        </div>
+        </div> */}
       </div>
     </DefaultLayout>
   );

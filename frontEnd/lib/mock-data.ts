@@ -9,20 +9,21 @@ export const mockSiteData: SiteData = {
       "<p>这是 Next 迁移演示版本，当前所有布局数据都来自 <strong>mock</strong> 层。</p>",
     established: "2024-01-01",
     sidebarSocial: [
-      { name: "GitHub", url: "https://github.com/", icon: "github-fill" },
-      { name: "Mail", url: "mailto:hello@example.com", icon: "mail-line" },
-      { name: "RSS", url: "/rss.xml", icon: "rss-line" }
+      { name: "GitHub", url: "https://github.com/xwh105419517", icon: "github-fill" }
     ],
     footerSocial: [
-      { name: "GitHub", url: "https://github.com/", icon: "github-fill", position: "left" },
+      {
+        name: "GitHub",
+        url: "https://github.com/xwh105419517",
+        icon: "github-fill",
+        position: "left"
+      },
       {
         name: "Bilibili",
         url: "https://www.bilibili.com/",
         icon: "bilibili-fill",
         position: "left"
-      },
-      { name: "Mail", url: "mailto:hello@example.com", icon: "mail-line", position: "right" },
-      { name: "RSS", url: "/rss.xml", icon: "rss-line", position: "right" }
+      }
     ],
     footerLinks: [
       { name: "关于", url: "/about" },
@@ -62,14 +63,14 @@ export const mockSiteData: SiteData = {
       url: "/archive",
       icon: "ri-archive-line"
     },
-    {
-      id: 6,
-      type: "navigation",
-      parentId: null,
-      title: "动态",
-      url: "/moment",
-      icon: "ri-send-plane-fill"
-    },
+    // {
+    //   id: 6,
+    //   type: "navigation",
+    //   parentId: null,
+    //   title: "动态",
+    //   url: "/moment",
+    //   icon: "ri-send-plane-fill"
+    // },
     {
       id: 5,
       type: "about",
@@ -198,7 +199,10 @@ export const mockSiteData: SiteData = {
     {
       id: 2,
       publishTime: "2026-04-15T18:20:00.000Z",
-      content: { text: "今天把页脚和侧栏的交互细节也对齐了。", images: ["https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&q=80"] }
+      content: {
+        text: "今天把页脚和侧栏的交互细节也对齐了。",
+        images: ["https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&q=80"]
+      }
     },
     {
       id: 3,
@@ -208,27 +212,54 @@ export const mockSiteData: SiteData = {
     {
       id: 4,
       publishTime: "2026-04-13T20:45:00.000Z",
-      content: { text: "Next.js 16 的 App Router 真的很强大，推荐大家都试试！", images: ["https://images.unsplash.com/photo-1633356122102-3fe601e05bd2?w=800&q=80", "https://images.unsplash.com/photo-1627398242454-45a1465c2479?w=800&q=80"] }
+      content: {
+        text: "Next.js 16 的 App Router 真的很强大，推荐大家都试试！",
+        images: [
+          "https://images.unsplash.com/photo-1633356122102-3fe601e05bd2?w=800&q=80",
+          "https://images.unsplash.com/photo-1627398242454-45a1465c2479?w=800&q=80"
+        ]
+      }
     },
     {
       id: 5,
       publishTime: "2026-04-12T11:00:00.000Z",
-      content: { text: "Tailwind CSS v4 的 CSS-first 配置太香了，主题切换变得前所未有的简单。", location: "深圳" }
+      content: {
+        text: "Tailwind CSS v4 的 CSS-first 配置太香了，主题切换变得前所未有的简单。",
+        location: "深圳"
+      }
     },
     {
       id: 6,
       publishTime: "2026-04-11T16:30:00.000Z",
-      content: { text: "完成了动态页面的瀑布流布局，CSS Grid 配合 JavaScript 计算高度，效果很不错。", images: ["https://images.unsplash.com/photo-1507721999472-8ed4421c4af2?w=800&q=80", "https://images.unsplash.com/photo-1551650975-87deedd944c3?w=800&q=80", "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80"] }
+      content: {
+        text: "完成了动态页面的瀑布流布局，CSS Grid 配合 JavaScript 计算高度，效果很不错。",
+        images: [
+          "https://images.unsplash.com/photo-1507721999472-8ed4421c4af2?w=800&q=80",
+          "https://images.unsplash.com/photo-1551650975-87deedd944c3?w=800&q=80",
+          "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80"
+        ]
+      }
     },
     {
       id: 7,
       publishTime: "2026-04-10T09:15:00.000Z",
-      content: { text: "TypeScript 5.4 的 NoInfer 工具类型终于来了，类型推断更精准了。", location: "广州" }
+      content: {
+        text: "TypeScript 5.4 的 NoInfer 工具类型终于来了，类型推断更精准了。",
+        location: "广州"
+      }
     },
     {
       id: 8,
       publishTime: "2026-04-09T22:00:00.000Z",
-      content: { text: "Shadcn/ui 组件库真的很不错，直接复制代码到项目里，完全可控。", images: ["https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=800&q=80", "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80", "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=800&q=80", "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80"] }
+      content: {
+        text: "Shadcn/ui 组件库真的很不错，直接复制代码到项目里，完全可控。",
+        images: [
+          "https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=800&q=80",
+          "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80",
+          "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=800&q=80",
+          "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80"
+        ]
+      }
     },
     {
       id: 9,
@@ -238,47 +269,88 @@ export const mockSiteData: SiteData = {
     {
       id: 10,
       publishTime: "2026-04-07T19:45:00.000Z",
-      content: { text: "React Server Components 彻底改变了前端开发范式，服务端客户端界限更清晰。", images: ["https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&q=80", "https://images.unsplash.com/photo-1627398242454-45a1465c2479?w=800&q=80", "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&q=80", "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&q=80", "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80", "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80"] }
+      content: {
+        text: "React Server Components 彻底改变了前端开发范式，服务端客户端界限更清晰。",
+        images: [
+          "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&q=80",
+          "https://images.unsplash.com/photo-1627398242454-45a1465c2479?w=800&q=80",
+          "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&q=80",
+          "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&q=80",
+          "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80",
+          "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80"
+        ]
+      }
     },
     {
       id: 11,
       publishTime: "2026-04-06T08:20:00.000Z",
-      content: { text: "周末去徒步，登顶的那一刻感觉所有的疲惫都值了。大自然真的太美好了！", location: "惠州" }
+      content: {
+        text: "周末去徒步，登顶的那一刻感觉所有的疲惫都值了。大自然真的太美好了！",
+        location: "惠州"
+      }
     },
     {
       id: 12,
       publishTime: "2026-04-05T17:10:00.000Z",
-      content: { text: "博客的深色模式适配完成，现在支持跟随系统主题自动切换了。", location: "深圳" }
+      content: {
+        text: "博客的深色模式适配完成，现在支持跟随系统主题自动切换了。",
+        location: "深圳"
+      }
     },
     {
       id: 13,
       publishTime: "2026-04-04T21:30:00.000Z",
-      content: { text: "研究发现 CSS 的 container queries 比 media queries 更加灵活，推荐大家试试！", images: ["https://images.unsplash.com/photo-1507721999472-8ed4421c4af2?w=800&q=80"] }
+      content: {
+        text: "研究发现 CSS 的 container queries 比 media queries 更加灵活，推荐大家试试！",
+        images: ["https://images.unsplash.com/photo-1507721999472-8ed4421c4af2?w=800&q=80"]
+      }
     },
     {
       id: 14,
       publishTime: "2026-04-03T12:00:00.000Z",
-      content: { text: "性能优化无止境，今天把博客的 LCP 从 3.2s 优化到了 1.8s，进步很明显。", location: "广州" }
+      content: {
+        text: "性能优化无止境，今天把博客的 LCP 从 3.2s 优化到了 1.8s，进步很明显。",
+        location: "广州"
+      }
     },
     {
       id: 15,
       publishTime: "2026-04-02T15:45:00.000Z",
-      content: { text: "最近在研究 Astro 框架，适合做内容类网站，性能真的很强。", images: ["https://images.unsplash.com/photo-1633356122102-3fe601e05bd2?w=800&q=80", "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80"] }
+      content: {
+        text: "最近在研究 Astro 框架，适合做内容类网站，性能真的很强。",
+        images: [
+          "https://images.unsplash.com/photo-1633356122102-3fe601e05bd2?w=800&q=80",
+          "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80"
+        ]
+      }
     },
     {
       id: 16,
       publishTime: "2026-04-01T10:00:00.000Z",
-      content: { text: "博客的评论区上线了，支持 Markdown 语法，欢迎大家留言交流！", location: "深圳" }
+      content: {
+        text: "博客的评论区上线了，支持 Markdown 语法，欢迎大家留言交流！",
+        location: "深圳"
+      }
     },
     {
       id: 17,
       publishTime: "2026-03-31T20:15:00.000Z",
-      content: { text: "终于把文章详情页的目录导航做完了，支持滚动高亮当前章节。", location: "广州" }
+      content: {
+        text: "终于把文章详情页的目录导航做完了，支持滚动高亮当前章节。",
+        location: "广州"
+      }
     },
     {
       id: 18,
       publishTime: "2026-03-30T14:30:00.000Z",
-      content: { text: "新写了一篇关于 React Server Components 的文章，花了一周时间整理，欢迎阅读指正。", images: ["https://images.unsplash.com/photo-1627398242454-45a1465c2479?w=800&q=80", "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&q=80", "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&q=80"] }
+      content: {
+        text: "新写了一篇关于 React Server Components 的文章，花了一周时间整理，欢迎阅读指正。",
+        images: [
+          "https://images.unsplash.com/photo-1627398242454-45a1465c2479?w=800&q=80",
+          "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&q=80",
+          "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&q=80"
+        ]
+      }
     },
     {
       id: 19,
@@ -288,17 +360,26 @@ export const mockSiteData: SiteData = {
     {
       id: 20,
       publishTime: "2026-03-28T18:45:00.000Z",
-      content: { text: "Framer Motion 动画库真强大，页面过渡动画做起来太顺手了。", location: "广州" }
+      content: {
+        text: "Framer Motion 动画库真强大，页面过渡动画做起来太顺手了。",
+        location: "广州"
+      }
     },
     {
       id: 21,
       publishTime: "2026-03-27T11:20:00.000Z",
-      content: { text: "博客搬家到新服务器，备案也终于通过了，以后可以稳定访问啦！", location: "深圳" }
+      content: {
+        text: "博客搬家到新服务器，备案也终于通过了，以后可以稳定访问啦！",
+        location: "深圳"
+      }
     },
     {
       id: 22,
       publishTime: "2026-03-26T16:00:00.000Z",
-      content: { text: "Next.js 16 的 ISR 真的很强大，静态生成加增量更新，完美组合。", images: ["https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80"] }
+      content: {
+        text: "Next.js 16 的 ISR 真的很强大，静态生成加增量更新，完美组合。",
+        images: ["https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80"]
+      }
     },
     {
       id: 23,
@@ -308,12 +389,21 @@ export const mockSiteData: SiteData = {
     {
       id: 24,
       publishTime: "2026-03-24T13:15:00.000Z",
-      content: { text: "写了一篇关于前端工程化的思考，总结了这几年的一些经验教训。", images: ["https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80", "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=800&q=80"] }
+      content: {
+        text: "写了一篇关于前端工程化的思考，总结了这几年的一些经验教训。",
+        images: [
+          "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80",
+          "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=800&q=80"
+        ]
+      }
     },
     {
       id: 25,
       publishTime: "2026-03-23T08:45:00.000Z",
-      content: { text: "Tailwind CSS 的自定义主题配置终于搞清楚了，design token 设计很重要。", location: "广州" }
+      content: {
+        text: "Tailwind CSS 的自定义主题配置终于搞清楚了，design token 设计很重要。",
+        location: "广州"
+      }
     },
     {
       id: 26,
@@ -323,22 +413,46 @@ export const mockSiteData: SiteData = {
     {
       id: 27,
       publishTime: "2026-03-21T21:00:00.000Z",
-      content: { text: "部署了博客的评论区反垃圾机制，终于清净多了。", images: ["https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=800&q=80", "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80", "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=800&q=80", "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80"] }
+      content: {
+        text: "部署了博客的评论区反垃圾机制，终于清净多了。",
+        images: [
+          "https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=800&q=80",
+          "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80",
+          "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=800&q=80",
+          "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80"
+        ]
+      }
     },
     {
       id: 28,
       publishTime: "2026-03-20T10:30:00.000Z",
-      content: { text: "TypeScript 的类型编程真是一门艺术，高级类型用好了可以减少很多运行时错误。", location: "广州" }
+      content: {
+        text: "TypeScript 的类型编程真是一门艺术，高级类型用好了可以减少很多运行时错误。",
+        location: "广州"
+      }
     },
     {
       id: 29,
       publishTime: "2026-03-19T15:45:00.000Z",
-      content: { text: "博客的 SEO 优化做了大半，sitemap、robots.txt 都配置好了，等待搜索引擎收录。", location: "深圳" }
+      content: {
+        text: "博客的 SEO 优化做了大半，sitemap、robots.txt 都配置好了，等待搜索引擎收录。",
+        location: "深圳"
+      }
     },
     {
       id: 30,
       publishTime: "2026-03-18T19:15:00.000Z",
-      content: { text: "又写完了一篇长文，这次是关于微前端架构的实践心得，万字长文诚意满满。", images: ["https://images.unsplash.com/photo-1633356122102-3fe601e05bd2?w=800&q=80", "https://images.unsplash.com/photo-1627398242454-45a1465c2479?w=800&q=80", "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80", "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&q=80", "https://images.unsplash.com/photo-1507721999472-8ed4421c4af2?w=800&q=80", "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80"] }
+      content: {
+        text: "又写完了一篇长文，这次是关于微前端架构的实践心得，万字长文诚意满满。",
+        images: [
+          "https://images.unsplash.com/photo-1633356122102-3fe601e05bd2?w=800&q=80",
+          "https://images.unsplash.com/photo-1627398242454-45a1465c2479?w=800&q=80",
+          "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80",
+          "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&q=80",
+          "https://images.unsplash.com/photo-1507721999472-8ed4421c4af2?w=800&q=80",
+          "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80"
+        ]
+      }
     }
   ],
   friends: [

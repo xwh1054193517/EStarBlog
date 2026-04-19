@@ -16,10 +16,6 @@ export default function WebInfoCard({
       </div>
       <div className="webinfo">
         <div className="webinfo-item">
-          <div className="item-name">本站总字数 :</div>
-          <div className="item-count">{stats.totalWords}</div>
-        </div>
-        <div className="webinfo-item">
           <div className="item-name">本站访客量 :</div>
           <div className="item-count">{stats.totalVisitors}</div>
         </div>
@@ -30,10 +26,6 @@ export default function WebInfoCard({
         <div className="webinfo-item">
           <div className="item-name">当前在线人数 :</div>
           <div className="item-count">{stats.onlineUsers}</div>
-        </div>
-        <div className="webinfo-item">
-          <div className="item-name">网站运行天数 :</div>
-          <div className="item-count">{getRunningDays(established)}</div>
         </div>
       </div>
     </div>

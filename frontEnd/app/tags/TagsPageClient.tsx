@@ -21,7 +21,7 @@ export default function TagsPageClient({ tags, siteData }: TagsPageClientProps) 
                 <Link href={tag.url} className="tag-list-link">
                   {tag.name}
                 </Link>
-                <span className="tag-list-count">({tag.count})</span>
+                {/* <span className="tag-list-count">({tag.count})</span> */}
               </li>
             ))}
           </ul>

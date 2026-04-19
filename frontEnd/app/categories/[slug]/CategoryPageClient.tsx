@@ -5,22 +5,22 @@ import DefaultLayout from "@/components/layouts/DefaultLayout";
 import ArticleSortList from "@/components/features/archive/ArticleSortList";
 import Pagination from "@/components/ui/Pagination";
 import { useArticles } from "@/lib/api/article-api";
-import type { TagItem, SiteData } from "@/lib/types";
+import type { CategoryItem, SiteData } from "@/lib/types";
 
-interface TagPageClientProps {
+interface CategoryPageClientProps {
   slug: string;
-  tag: TagItem;
+  category: CategoryItem;
   siteData: SiteData;
 }
 
-export default function TagPageClient({ slug, tag, siteData }: TagPageClientProps) {
+export default function CategoryPageClient({ slug, category, siteData }: CategoryPageClientProps) {
   const [page, setPage] = useState(1);
   const pageSize = 10;
 
   const { data, isLoading, isError } = useArticles({
     page,
     pageSize,
-    tag: slug
+    category: slug
   });
 
   const handlePageChange = (newPage: number) => {
@@ -41,7 +41,7 @@ export default function TagPageClient({ slug, tag, siteData }: TagPageClientProp
           <>
             <ArticleSortList
               articles={data?.list ?? []}
-              title={`标签 - ${tag.name}`}
+              title={`分类 - ${category.name}`}
               total={data?.total}
             />
             {data && data.total > pageSize && (

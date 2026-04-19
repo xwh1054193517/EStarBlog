@@ -1,11 +1,41 @@
 import { mockArticle, mockSiteData, mockArticles } from "@/lib/mock-data";
+import { getSiteConfig } from "@/lib/api/siteConfigApi";
+import { getPublicCategories, getPublicTags } from "@/lib/api/publicApi";
 import type { Article, SiteData, TagsOverview, MomentItem } from "@/lib/types";
 
 const wait = (ms = 60) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export async function getMockSiteData(): Promise<SiteData> {
-  await wait();
-  return mockSiteData;
+  try {
+    const config = await getSiteConfig();
+    const [categories, tags] = await Promise.all([getPublicCategories(), getPublicTags()]);
+    return {
+      ...mockSiteData,
+      blogConfig: {
+        ...mockSiteData.blogConfig,
+        ...config.blog
+      } as SiteData["blogConfig"],
+      basicConfig: {
+        ...mockSiteData.basicConfig,
+        ...config.basic
+      },
+      categories: categories.map((c) => ({
+        ...c,
+        id: c.id as unknown as number,
+        url: `/categories/${c.slug}`,
+        count: c.postCount ?? 0
+      })) as SiteData["categories"],
+      tags: tags.map((t) => ({
+        ...t,
+        id: t.id as unknown as number,
+        url: `/tags/${t.slug}`,
+        count: t.postCount ?? 0
+      })) as SiteData["tags"]
+    };
+  } catch (error) {
+    console.warn("Failed to fetch categories/tags from API, using mock:", error);
+    return mockSiteData;
+  }
 }
 
 export async function getMockArticleBySlug(_slug: string): Promise<Article> {
@@ -21,7 +51,8 @@ export async function getMockArticles(): Promise<Article[]> {
 export async function getMockTagsOverview(): Promise<TagsOverview> {
   await wait();
 
-  const tags = [...mockSiteData.tags].sort((a, b) => b.count - a.count);
+  const siteData = await getMockSiteData();
+  const tags = [...siteData.tags].sort((a, b) => b.count - a.count);
 
   return {
     tags,

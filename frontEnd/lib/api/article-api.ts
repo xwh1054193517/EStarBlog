@@ -17,8 +17,7 @@ export function useArticles(params?: {
 }) {
   return useQuery<ArticleListResponse>({
     queryKey: ["articles", params],
-    queryFn: () =>
-      api.get<ArticleListResponse>("/posts", { params: params as any })
+    queryFn: () => api.get<ArticleListResponse>("/posts", { params: params as any })
   });
 }
 
