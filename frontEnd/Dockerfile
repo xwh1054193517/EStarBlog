@@ -20,6 +20,13 @@ COPY package.json pnpm-lock.yaml ./
 COPY tsconfig.json next.config.ts ./
 COPY public ./public
 COPY app ./app
+
+COPY app ./app
+
+COPY lib ./lib
+COPY components ./components
+COPY hooks ./hooks
+COPY stores ./stores
 # 若使用 App Router，可补充：COPY app ./app
 # 其他自定义目录按需补充 COPY ... ./...
 
