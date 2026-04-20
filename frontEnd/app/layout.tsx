@@ -29,10 +29,10 @@ export default function RootLayout({
   return (
     <html lang="zh-CN" data-theme="dark" data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
-        {/* 中性风格图标 自适应 */}
+        {/* Remix Icon - 本地加载，避免CDN阻塞 */}
         <link
           rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css"
+          href="/fonts/remixicon.css"
         />
         <Script id="theme-init" strategy="beforeInteractive">
           {themeSetScrip}

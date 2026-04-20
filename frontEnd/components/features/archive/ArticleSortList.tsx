@@ -74,7 +74,7 @@ export default function ArticleSortList({
               {group.articles.map((article) => (
                 <div key={article.slug} className="article-sort-item">
                   <Link href={article.url} className="article-sort-item-img">
-                    <img src={article.cover || DEFAULT_COVER} alt={article.title} loading="lazy" />
+                    <img src={article.cover || DEFAULT_COVER} alt={article.title} loading="lazy" decoding="async" />
                   </Link>
                   <div className="article-sort-item-info">
                     <div className="article-sort-item-time">
@@ -92,7 +92,7 @@ export default function ArticleSortList({
         : articles.map((article) => (
             <div key={article.id} className="article-sort-item">
               <Link href={article.url} className="article-sort-item-img">
-                <img src={article.cover || DEFAULT_COVER} alt={article.title} loading="lazy" />
+                <img src={article.cover || DEFAULT_COVER} alt={article.title} loading="lazy" decoding="async" />
               </Link>
               <div className="article-sort-item-info">
                 <div className="article-sort-item-time">

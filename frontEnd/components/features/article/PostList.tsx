@@ -34,7 +34,12 @@ export default function PostList({ articles, onWaterfallReady }: PostListProps) 
 
           <div className="post-cover">
             <Link href={article.url}>
-              <img src={article.cover || DEFAULT_COVER} alt={article.title} loading="lazy" />
+              <img
+                src={article.cover || DEFAULT_COVER}
+                alt={article.title}
+                loading="lazy"
+                decoding="async"
+              />
             </Link>
           </div>
 
