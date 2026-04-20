@@ -19,7 +19,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY package.json pnpm-lock.yaml ./
 COPY tsconfig.json next.config.js ./
 COPY public ./public
-COPY src ./src
+COPY app ./app
 # 若使用 App Router，可补充：COPY app ./app
 # 其他自定义目录按需补充 COPY ... ./...
 
