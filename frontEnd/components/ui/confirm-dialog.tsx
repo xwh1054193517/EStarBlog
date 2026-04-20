@@ -59,13 +59,21 @@ export function ConfirmDialog({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent aria-describedby="dialog-description" className="sm:max-w-[425px]">
+      <DialogContent
+        aria-describedby="dialog-description"
+        className="sm:max-w-[500px] w-[calc(100%-2rem)] overflow-hidden"
+      >
         <DialogHeader className="text-center sm:text-left">
           {(icon || defaultIcon) && (
             <div className="flex justify-center sm:justify-start mb-4">{icon || defaultIcon}</div>
           )}
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription id="dialog-description">{description}</DialogDescription>
+          <DialogTitle className="text-lg">{title}</DialogTitle>
+          <DialogDescription
+            id="dialog-description"
+            className="break-all whitespace-pre-wrap max-h-[40vh] overflow-y-auto text-sm sm:text-base"
+          >
+            {description}
+          </DialogDescription>
         </DialogHeader>
         <DialogFooter className="flex-col-reverse sm:flex-row gap-2">
           <Button

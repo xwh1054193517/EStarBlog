@@ -1,6 +1,6 @@
 "use client";
 
-import { Eye, Trash2, Download, Copy, Check } from "lucide-react";
+import { Trash2, Download, Copy, Check, Eye } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { formatFileSize, type UploadFile } from "@/lib/api/uploadApi";
@@ -68,10 +68,7 @@ export function FileCard({ file, onPreview, onDelete }: FileCardProps) {
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
-      <div
-        className="aspect-square cursor-pointer relative group"
-        onClick={() => onPreview(file)}
-      >
+      <div className="aspect-square cursor-pointer relative group" onClick={() => onPreview(file)}>
         {getFileIcon()}
         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
           <Button
@@ -97,35 +94,31 @@ export function FileCard({ file, onPreview, onDelete }: FileCardProps) {
         </div>
         <div className="flex items-center gap-1 pt-2 border-t border-gray-100">
           <Button
-            size="sm"
+            size="icon"
             variant="ghost"
             onClick={handleCopy}
-            className="flex-1 h-8"
+            className="h-7 w-7 flex-shrink-0"
+            title="复制链接"
           >
-            {copied ? (
-              <Check className="h-3 w-3 mr-1 text-green-600" />
-            ) : (
-              <Copy className="h-3 w-3 mr-1" />
-            )}
-            {copied ? "已复制" : "复制"}
+            {copied ? <Check className="h-3 w-3 text-green-600" /> : <Copy className="h-3 w-3" />}
           </Button>
           <Button
-            size="sm"
+            size="icon"
             variant="ghost"
             onClick={handleDownload}
-            className="flex-1 h-8"
+            className="h-7 w-7 flex-shrink-0"
+            title="下载"
           >
-            <Download className="h-3 w-3 mr-1" />
-            下载
+            <Download className="h-3 w-3" />
           </Button>
           <Button
-            size="sm"
+            size="icon"
             variant="ghost"
             onClick={() => onDelete(file)}
-            className="flex-1 h-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+            className="h-7 w-7 flex-shrink-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+            title="删除"
           >
-            <Trash2 className="h-3 w-3 mr-1" />
-            删除
+            <Trash2 className="h-3 w-3" />
           </Button>
         </div>
       </div>

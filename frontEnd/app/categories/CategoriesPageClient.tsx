@@ -21,7 +21,7 @@ export default function CategoriesPageClient({ categories, siteData }: Categorie
                 <Link href={category.url} className="category-list-link">
                   {category.name}
                 </Link>
-                <span className="category-list-count">({category.count})</span>
+                <span className="category-list-count">{category.count}</span>
               </li>
             ))}
           </ul>

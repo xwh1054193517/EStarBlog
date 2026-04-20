@@ -40,14 +40,14 @@ export default function TagsDetailPageClient({ slug, tag, siteData }: TagsDetail
         ) : (
           <>
             <ArticleSortList
-              articles={data?.list ?? []}
+              articles={data?.items ?? []}
               title={`标签 - ${tag.name}`}
-              total={data?.total}
+              total={data?.pagination?.total}
             />
-            {data && data.total > pageSize && (
+            {data && data.pagination && data.pagination.total > pageSize && (
               <Pagination
                 currentPage={page}
-                totalPages={Math.ceil(data.total / pageSize)}
+                totalPages={data.pagination.totalPages}
                 onPageChange={handlePageChange}
               />
             )}

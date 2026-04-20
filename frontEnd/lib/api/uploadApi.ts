@@ -14,12 +14,35 @@ export interface UploadFile {
   createdAt: string;
 }
 
+interface AssetFromApi {
+  id: string;
+  filename: string;
+  originalName: string;
+  mimeType: string;
+  size: number;
+  storageKey: string;
+  url: string;
+  createdAt: string;
+}
+
 export interface AssetsResponse {
   data: UploadFile[];
   total: number;
   page: number;
   pageSize: number;
   totalPages: number;
+}
+
+function convertAsset(asset: AssetFromApi): UploadFile {
+  return {
+    id: asset.id,
+    objectName: asset.storageKey,
+    fileName: asset.originalName || asset.filename,
+    fileType: getFileType(asset.mimeType),
+    fileSize: asset.size,
+    fileUrl: asset.url,
+    createdAt: asset.createdAt,
+  };
 }
 
 export interface PresignedUrlResponse {
@@ -44,9 +67,20 @@ export async function getMyAssets(
   page = 1,
   pageSize = 20
 ): Promise<AssetsResponse> {
-  return api.get<AssetsResponse>("/uploads/my-assets", {
+  const response = await api.get<{
+    data: AssetFromApi[];
+    total: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+  }>("/uploads/my-assets", {
     params: { page, pageSize },
   });
+
+  return {
+    ...response,
+    data: response.data.map(convertAsset),
+  };
 }
 
 export async function uploadFile(
@@ -78,12 +112,12 @@ export async function uploadFile(
         try {
           const response = JSON.parse(xhr.responseText);
           const result: UploadFile = {
-            id: response.id || response.storageKey,
-            objectName: response.storageKey || response.objectName,
-            fileName: response.originalName || response.fileName || file.name,
-            fileType: getFileType(response.contentType || file.type),
-            fileSize: response.fileSize || file.size,
-            fileUrl: response.url || `${API_BASE_URL}/uploads/${response.storageKey || response.objectName}/download`,
+            id: response.id,
+            objectName: response.storageKey,
+            fileName: response.originalName || file.name,
+            fileType: getFileType(response.mimeType || file.type),
+            fileSize: response.size || file.size,
+            fileUrl: response.url,
             createdAt: response.createdAt || new Date().toISOString(),
           };
           resolve(result);

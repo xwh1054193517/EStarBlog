@@ -3505,7 +3505,6 @@ html[data-reading-mode="true"] .main-content {
 #post-list {
   position: relative;
   width: 100%;
-  min-height: 500px;
 }
 
 .post-items {

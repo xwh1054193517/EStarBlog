@@ -1,6 +1,7 @@
 import { getSiteConfig } from "@/lib/api/siteConfigApi";
 import { getPublicCategories, getPublicTags } from "@/lib/api/publicApi";
-import { getArticles } from "@/lib/api/article-api";
+import { getArticleCount, getArticles } from "@/lib/api/article-api";
+import { getArchives } from "@/lib/api/archiveApi";
 import type {
   Article,
   SiteData,
@@ -78,59 +79,6 @@ const defaultFooterMenus: MenuItem[] = [
   }
 ];
 
-const defaultAggregateMenus: MenuItem[] = [
-  {
-    id: 30,
-    type: "aggregate",
-    parentId: null,
-    title: "发现",
-    url: "",
-    children: [
-      {
-        id: 31,
-        type: "aggregate",
-        parentId: 30,
-        title: "友链",
-        url: "/friend",
-        icon: "ri-links-line"
-      },
-      {
-        id: 32,
-        type: "aggregate",
-        parentId: 30,
-        title: "订阅",
-        url: "/subscribe",
-        icon: "ri-mail-open-line"
-      }
-    ]
-  },
-  {
-    id: 40,
-    type: "aggregate",
-    parentId: null,
-    title: "工具",
-    url: "",
-    children: [
-      {
-        id: 41,
-        type: "aggregate",
-        parentId: 40,
-        title: "统计",
-        url: "/statistics",
-        icon: "ri-bar-chart-box-line"
-      },
-      {
-        id: 42,
-        type: "aggregate",
-        parentId: 40,
-        title: "搜索",
-        url: "/search",
-        icon: "ri-search-line"
-      }
-    ]
-  }
-];
-
 export async function getMockSiteData(): Promise<SiteData> {
   const config = await getSiteConfig();
   const [categories, tags] = await Promise.all([getPublicCategories(), getPublicTags()]);
@@ -149,7 +97,6 @@ export async function getMockSiteData(): Promise<SiteData> {
     basicConfig: config.basic,
     navigationMenus: defaultNavigationMenus,
     footerMenus: defaultFooterMenus,
-    aggregateMenus: defaultAggregateMenus,
     categories: categories.map((c) => ({
       id: safeNumber(c.id),
       name: c.name,
@@ -164,7 +111,7 @@ export async function getMockSiteData(): Promise<SiteData> {
       url: `/tags/${t.slug}`,
       count: t.postCount ?? 0
     })) as TagItem[],
-    archives: [],
+    archives: await getArchives(),
     moments: [],
     friends: [],
     siteStats: {
@@ -180,7 +127,7 @@ export async function getMockSiteData(): Promise<SiteData> {
       avatar: "",
       unreadCount: 0
     },
-    articleCount: 0
+    articleCount: await getArticleCount()
   };
 }
 

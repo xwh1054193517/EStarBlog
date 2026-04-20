@@ -169,7 +169,6 @@ export interface SiteData {
   basicConfig: BasicConfig;
   navigationMenus: MenuItem[];
   footerMenus: MenuItem[];
-  aggregateMenus: MenuItem[];
   categories: CategoryItem[];
   tags: TagItem[];
   archives: ArchiveItem[];

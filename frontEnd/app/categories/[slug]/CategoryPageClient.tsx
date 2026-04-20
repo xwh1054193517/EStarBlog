@@ -40,14 +40,14 @@ export default function CategoryPageClient({ slug, category, siteData }: Categor
         ) : (
           <>
             <ArticleSortList
-              articles={data?.list ?? []}
+              articles={data?.items ?? []}
               title={`分类 - ${category.name}`}
-              total={data?.total}
+              total={data?.pagination?.total}
             />
-            {data && data.total > pageSize && (
+            {data && data.pagination && data.pagination.total > pageSize && (
               <Pagination
                 currentPage={page}
-                totalPages={Math.ceil(data.total / pageSize)}
+                totalPages={data.pagination.totalPages}
                 onPageChange={handlePageChange}
               />
             )}

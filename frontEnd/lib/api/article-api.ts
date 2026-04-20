@@ -3,10 +3,13 @@ import { api } from "./useFetch";
 import type { Article, TocSection } from "@/lib/types";
 
 export interface ArticleListResponse {
-  list: Article[];
-  total: number;
-  page: number;
-  pageSize: number;
+  items: Article[];
+  pagination: {
+    page: number;
+    pageSize: number;
+    total: number;
+    totalPages: number;
+  };
 }
 
 export interface ArticleListResult {
@@ -47,7 +50,7 @@ function convertPostToArticle(post: PostFromApi): Article {
   return {
     id: safeNumber(post.id),
     slug: post.slug,
-    url: `/articles/${post.slug}`,
+    url: `/posts/${post.slug}`,
     title: post.title,
     summary: post.excerpt || "",
     cover: post.coverImage || undefined,
@@ -75,6 +78,11 @@ function convertPostToArticle(post: PostFromApi): Article {
 }
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api";
+
+export async function getArticleCount(): Promise<number> {
+  const result = await getArticles({ page: 1, pageSize: 1 });
+  return result.pagination.total;
+}
 
 export async function getArticles(params?: {
   page?: number;
@@ -116,16 +124,33 @@ export function useArticles(params?: {
   category?: string;
   tag?: string;
 }) {
-  return useQuery<ArticleListResponse>({
+  return useQuery<ArticleListResult>({
     queryKey: ["articles", params],
-    queryFn: () => api.get<ArticleListResponse>("/posts", { params: params as any })
+    queryFn: async () => {
+      const response = await api.get<{
+        items: PostFromApi[];
+        pagination: {
+          page: number;
+          pageSize: number;
+          total: number;
+          totalPages: number;
+        };
+      }>("/posts", { params: params as any });
+      return {
+        items: response.items.map(convertPostToArticle),
+        pagination: response.pagination
+      };
+    }
   });
 }
 
 export function useArticle(slug: string) {
   return useQuery<Article>({
     queryKey: ["article", slug],
-    queryFn: () => api.get<Article>(`/posts/${slug}`),
+    queryFn: async () => {
+      const post = await api.get<PostFromApi>(`/posts/${slug}`);
+      return convertPostToArticle(post);
+    },
     enabled: !!slug
   });
 }

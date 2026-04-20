@@ -5,15 +5,16 @@ on:
     branches:
       - main
     paths:
+      - 'frontEnd/**'
       - 'backEnd/**'
-      - '.github/workflows/deploy-backend.yml'
+      - '.github/workflows/deploy-yml'
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy backend to server
+      - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SERVER_HOST }}
@@ -21,4 +22,4 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_PORT }}
           script: |
-            ~/estarblog/backend/deploy.sh
+            ~/estarblog/project/deploy.sh

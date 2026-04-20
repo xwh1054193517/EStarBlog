@@ -18,7 +18,7 @@ export default function TagsPageClient({ tags, siteData }: TagsPageClientProps) 
           <ul className="tag-list">
             {tags.map((tag) => (
               <li key={tag.slug} className="tag-list-item">
-                <Link href={tag.url} className="tag-list-link">
+                <Link href={tag.url} className="tag-list-link text-lg font-medium">
                   {tag.name}
                 </Link>
                 {/* <span className="tag-list-count">({tag.count})</span> */}

@@ -44,6 +44,9 @@ export class UploadsService implements OnModuleInit {
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     'text/plain',
   ]);
+
+  private readonly publicUrl: string;
+
   constructor(
     private readonly configService: ConfigService,
     private readonly prisma: PrismaService,
@@ -58,6 +61,10 @@ export class UploadsService implements OnModuleInit {
     const protocol = useSSL ? 'https' : 'http';
 
     this.bucket = this.configService.get<string>('MINIO_BUCKET', 'app-files');
+
+    this.publicUrl =
+      this.configService.get<string>('MINIO_PUBLIC_URL', '').replace(/\/+$/, '') ||
+      `${protocol}://${endpoint}:${port}/${this.bucket}`;
 
     this.s3 = new S3Client({
       region: this.configService.get<string>('MINIO_REGION', 'us-east-1'),
@@ -138,7 +145,7 @@ export class UploadsService implements OnModuleInit {
     );
 
     const previewUrl = await this.getPresignedDownloadUrl(objectName, 3600);
-    const url = previewUrl.split('?')[0];
+    const url = `${this.publicUrl}/${objectName}`;
 
     if (createdById) {
       await this.prisma.uploadAsset.create({
@@ -288,7 +295,7 @@ export class UploadsService implements OnModuleInit {
 
     const stat = await this.statFile(dto.objectName);
     const previewUrl = await this.getPresignedDownloadUrl(dto.objectName, 3600);
-    const url = previewUrl.split('?')[0];
+    const url = `${this.publicUrl}/${dto.objectName}`;
 
     if (createdById) {
       await this.prisma.uploadAsset.create({

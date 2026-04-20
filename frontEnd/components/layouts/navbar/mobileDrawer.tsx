@@ -23,11 +23,6 @@ export default function MobileDrawer({
     };
   }, [open]);
 
-  const topAggregateMenus = useMemo(
-    () => siteData.aggregateMenus.filter((menu) => !menu.parentId && menu.children?.length),
-    [siteData.aggregateMenus]
-  );
-
   const toggleSubmenu = (menuId: number) => {
     setExpandedMenus((current) =>
       current.includes(menuId) ? current.filter((id) => id !== menuId) : [...current, menuId]
@@ -37,12 +32,6 @@ export default function MobileDrawer({
   return (
     <div className={`drawer-overlay${open ? " open" : ""}`} onClick={onClose}>
       <div className="drawer-container" onClick={(event) => event.stopPropagation()}>
-        <div className="avatar-img">
-          {siteData.basicConfig.authorAvatar && (
-            <img src={siteData.basicConfig.authorAvatar} alt="avatar" />
-          )}
-        </div>
-
         <div className="site-data">
           <Link href="/archive" onClick={onClose}>
             <div className="headline">文章</div>
@@ -94,27 +83,6 @@ export default function MobileDrawer({
                     </Link>
                   )
                 )}
-              </div>
-
-              <div className="aggregate-wrapper">
-                {topAggregateMenus.map((menu) => (
-                  <div key={menu.id}>
-                    <div className="section-title">{menu.title}</div>
-                    <div className="aggregate-grid">
-                      {menu.children?.map((child) => (
-                        <Link
-                          key={child.id}
-                          href={child.url}
-                          className="aggregate-item"
-                          onClick={onClose}
-                        >
-                          {child.icon ? <i className={child.icon} /> : null}
-                          <span>{child.title}</span>
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                ))}
               </div>
             </div>
           </div>

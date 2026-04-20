@@ -15,19 +15,60 @@ import {
 } from "@/lib/api/siteConfigApi";
 import type { BlogConfig, BasicConfig } from "@/lib/api/siteConfigApi";
 import { Loader2 } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+
+function useBlogConfig() {
+  return useQuery({
+    queryKey: ["siteConfig", "blog"],
+    queryFn: () => getBlogConfig()
+  });
+}
+
+function useBasicConfig() {
+  return useQuery({
+    queryKey: ["siteConfig", "basic"],
+    queryFn: () => getBasicConfig()
+  });
+}
 
 export default function SettingsPage() {
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<"blog" | "basic">("blog");
-  const [saving, setSaving] = useState(false);
-  const [blogConfig, setBlogConfig] = useState<BlogConfig>({
+
+  const { data: blogConfig, isLoading: blogLoading } = useBlogConfig();
+  const { data: basicConfig, isLoading: basicLoading } = useBasicConfig();
+
+  const blogMutation = useMutation({
+    mutationFn: (data: Partial<BlogConfig>) => updateBlogConfig(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["siteConfig", "blog"] });
+      toast.success("博客配置已保存");
+    },
+    onError: () => {
+      toast.error("保存博客配置失败");
+    }
+  });
+
+  const basicMutation = useMutation({
+    mutationFn: (data: Partial<BasicConfig>) => updateBasicConfig(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["siteConfig", "basic"] });
+      toast.success("基础配置已保存");
+    },
+    onError: () => {
+      toast.error("保存基础配置失败");
+    }
+  });
+
+  const [blogForm, setBlogForm] = useState<BlogConfig>({
     title: "",
     subtitle: "",
     typingTexts: [],
     announcement: "",
     established: ""
   });
-  const [basicConfig, setBasicConfig] = useState<BasicConfig>({
+
+  const [basicForm, setBasicForm] = useState<BasicConfig>({
     author: "",
     authorDesc: "",
     authorAvatar: "",
@@ -35,50 +76,27 @@ export default function SettingsPage() {
   });
 
   useEffect(() => {
-    async function loadData() {
-      try {
-        const [blog, basic] = await Promise.all([getBlogConfig(), getBasicConfig()]);
-        setBlogConfig(blog);
-        setBasicConfig(basic);
-      } catch (error) {
-        console.error("Failed to load settings:", error);
-        toast.error("加载设置失败");
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadData();
-  }, []);
+    if (blogConfig) setBlogForm(blogConfig);
+  }, [blogConfig]);
+
+  useEffect(() => {
+    if (basicConfig) setBasicForm(basicConfig);
+  }, [basicConfig]);
+
+  const loading = blogLoading || basicLoading;
+  const saving = blogMutation.isPending || basicMutation.isPending;
 
   const handleSaveBlog = async () => {
-    setSaving(true);
-    try {
-      await updateBlogConfig(blogConfig);
-      toast.success("博客配置已保存");
-    } catch (error) {
-      console.error("Failed to save blog config:", error);
-      toast.error("保存博客配置失败");
-    } finally {
-      setSaving(false);
-    }
+    blogMutation.mutate(blogForm);
   };
 
   const handleSaveBasic = async () => {
-    setSaving(true);
-    try {
-      await updateBasicConfig(basicConfig);
-      toast.success("基础配置已保存");
-    } catch (error) {
-      console.error("Failed to save basic config:", error);
-      toast.error("保存基础配置失败");
-    } finally {
-      setSaving(false);
-    }
+    basicMutation.mutate(basicForm);
   };
 
   const handleTypingTextsChange = (value: string) => {
     const texts = value.split("\n").filter((t) => t.trim() !== "");
-    setBlogConfig((prev) => ({ ...prev, typingTexts: texts }));
+    setBlogForm((prev) => ({ ...prev, typingTexts: texts }));
   };
 
   if (loading) {
@@ -103,9 +121,7 @@ export default function SettingsPage() {
           <button
             onClick={() => setActiveTab("blog")}
             className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-              activeTab === "blog"
-                ? "bg-white text-black"
-                : "text-gray-600 hover:text-gray-900"
+              activeTab === "blog" ? "bg-white text-black" : "text-gray-600 hover:text-gray-900"
             }`}
           >
             博客配置
@@ -113,9 +129,7 @@ export default function SettingsPage() {
           <button
             onClick={() => setActiveTab("basic")}
             className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-              activeTab === "basic"
-                ? "bg-white text-black"
-                : "text-gray-600 hover:text-gray-900"
+              activeTab === "basic" ? "bg-white text-black" : "text-gray-600 hover:text-gray-900"
             }`}
           >
             基础配置
@@ -130,33 +144,29 @@ export default function SettingsPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-700 mb-1 block">
-                    博客标题
-                  </label>
+                  <label className="text-sm font-medium text-gray-700 mb-1 block">博客标题</label>
                   <Input
-                    value={blogConfig.title}
-                    onChange={(e) => setBlogConfig((p) => ({ ...p, title: e.target.value }))}
+                    value={blogForm.title}
+                    onChange={(e) => setBlogForm((prev) => ({ ...prev, title: e.target.value }))}
                     placeholder="博客标题"
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700 mb-1 block">
-                    副标题
-                  </label>
+                  <label className="text-sm font-medium text-gray-700 mb-1 block">副标题</label>
                   <Input
-                    value={blogConfig.subtitle}
-                    onChange={(e) => setBlogConfig((p) => ({ ...p, subtitle: e.target.value }))}
+                    value={blogForm.subtitle}
+                    onChange={(e) => setBlogForm((prev) => ({ ...prev, subtitle: e.target.value }))}
                     placeholder="博客副标题"
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700 mb-1 block">
-                    建站日期
-                  </label>
+                  <label className="text-sm font-medium text-gray-700 mb-1 block">建站日期</label>
                   <Input
                     type="date"
-                    value={blogConfig.established}
-                    onChange={(e) => setBlogConfig((p) => ({ ...p, established: e.target.value }))}
+                    value={blogForm.established}
+                    onChange={(e) =>
+                      setBlogForm((prev) => ({ ...prev, established: e.target.value }))
+                    }
                   />
                 </div>
                 <div>
@@ -164,8 +174,10 @@ export default function SettingsPage() {
                     公告内容 (HTML)
                   </label>
                   <Textarea
-                    value={blogConfig.announcement}
-                    onChange={(e) => setBlogConfig((p) => ({ ...p, announcement: e.target.value }))}
+                    value={blogForm.announcement || ""}
+                    onChange={(e) =>
+                      setBlogForm((prev) => ({ ...prev, announcement: e.target.value }))
+                    }
                     placeholder="支持 HTML 格式"
                     rows={3}
                   />
@@ -179,7 +191,7 @@ export default function SettingsPage() {
               </CardHeader>
               <CardContent>
                 <Textarea
-                  value={blogConfig.typingTexts.join("\n")}
+                  value={blogForm.typingTexts.join("\n")}
                   onChange={(e) => handleTypingTextsChange(e.target.value)}
                   placeholder="每行一个文本"
                   rows={4}
@@ -207,22 +219,20 @@ export default function SettingsPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-700 mb-1 block">
-                    博主名称
-                  </label>
+                  <label className="text-sm font-medium text-gray-700 mb-1 block">博主名称</label>
                   <Input
-                    value={basicConfig.author}
-                    onChange={(e) => setBasicConfig((p) => ({ ...p, author: e.target.value }))}
+                    value={basicForm.author}
+                    onChange={(e) => setBasicForm((prev) => ({ ...prev, author: e.target.value }))}
                     placeholder="博主名称"
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700 mb-1 block">
-                    博主简介
-                  </label>
+                  <label className="text-sm font-medium text-gray-700 mb-1 block">博主简介</label>
                   <Textarea
-                    value={basicConfig.authorDesc}
-                    onChange={(e) => setBasicConfig((p) => ({ ...p, authorDesc: e.target.value }))}
+                    value={basicForm.authorDesc || ""}
+                    onChange={(e) =>
+                      setBasicForm((prev) => ({ ...prev, authorDesc: e.target.value }))
+                    }
                     placeholder="博主简介"
                     rows={3}
                   />
@@ -232,20 +242,18 @@ export default function SettingsPage() {
                     博主头像 URL
                   </label>
                   <Input
-                    value={basicConfig.authorAvatar}
+                    value={basicForm.authorAvatar}
                     onChange={(e) =>
-                      setBasicConfig((p) => ({ ...p, authorAvatar: e.target.value }))
+                      setBasicForm((prev) => ({ ...prev, authorAvatar: e.target.value }))
                     }
-                    placeholder="https://..."
+                    placeholder="头像 URL"
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700 mb-1 block">
-                    主页 URL
-                  </label>
+                  <label className="text-sm font-medium text-gray-700 mb-1 block">主页 URL</label>
                   <Input
-                    value={basicConfig.homeUrl}
-                    onChange={(e) => setBasicConfig((p) => ({ ...p, homeUrl: e.target.value }))}
+                    value={basicForm.homeUrl}
+                    onChange={(e) => setBasicForm((prev) => ({ ...prev, homeUrl: e.target.value }))}
                     placeholder="https://..."
                   />
                 </div>
