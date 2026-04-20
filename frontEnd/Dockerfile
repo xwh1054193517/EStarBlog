@@ -32,7 +32,8 @@ COPY stores ./stores
 
 ENV NEXT_TELEMETRY_DISABLED 1
 RUN pnpm run build
-
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL = $NEXT_PUBLIC_API_URL
 # ---------- production ----------
 FROM node:22-alpine AS production
 WORKDIR /app
