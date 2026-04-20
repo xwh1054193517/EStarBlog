@@ -13,7 +13,7 @@ const themeSetScrip = `
   (function () {
     try {
       var stored = localStorage.getItem('theme');
-      var dark = stored ? stored === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+      var dark = stored ? stored === 'dark' : true;
       document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
     } catch (error) {
       document.documentElement.setAttribute('data-theme', 'light');

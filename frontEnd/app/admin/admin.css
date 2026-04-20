@@ -1,6 +1,4 @@
-@import "tailwindcss";
-
-@custom-variant dark (&:is(.dark *));
+@import "../globals.css";
 
 :root {
   --admin-text: #17324d;
