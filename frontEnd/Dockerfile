@@ -17,7 +17,7 @@ RUN corepack enable && corepack prepare pnpm@9.0.0 --activate
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY package.json pnpm-lock.yaml ./
-COPY tsconfig.json next.config.js ./
+COPY tsconfig.json next.config.ts ./
 COPY public ./public
 COPY app ./app
 # 若使用 App Router，可补充：COPY app ./app
