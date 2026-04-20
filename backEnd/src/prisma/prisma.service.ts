@@ -5,9 +5,10 @@ import { PrismaClient } from '../generated/prisma';
 export class PrismaService extends PrismaClient implements OnModuleInit {
   constructor() {
     super({
-      log: process.env.NODE_ENV === 'development'
-        ? [{ emit: 'stdout', level: 'query' }]
-        : [{ emit: 'event', level: 'error' }],
+      log:
+        process.env.NODE_ENV === 'development'
+          ? [{ emit: 'stdout', level: 'query' }]
+          : [{ emit: 'event', level: 'error' }],
     });
   }
 

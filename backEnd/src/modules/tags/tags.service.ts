@@ -47,9 +47,17 @@ export class TagsService {
     }));
   }
 
-  async findAllAdmin(
-    query: SearchQueryDto,
-  ): Promise<PaginatedResult<{ id: string; name: string; slug: string; color: string | null; postCount: number; createdAt: string; updatedAt: string }>> {
+  async findAllAdmin(query: SearchQueryDto): Promise<
+    PaginatedResult<{
+      id: string;
+      name: string;
+      slug: string;
+      color: string | null;
+      postCount: number;
+      createdAt: string;
+      updatedAt: string;
+    }>
+  > {
     const page = query.page ?? 1;
     const pageSize = query.pageSize ?? 10;
     const skip = (page - 1) * pageSize;
