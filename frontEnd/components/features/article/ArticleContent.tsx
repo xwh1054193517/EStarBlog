@@ -1,13 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback, useMemo } from "react";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+import { useEffect, useRef, useState, useCallback } from "react";
+import { renderMarkdown } from "@/lib/markdown";
 import mermaid from "mermaid";
-import { generateHeadingId } from "@/lib/toc";
-import type { Components } from "react-markdown";
-// 由于 unified 包可能未安装，我们使用 any 类型来避免类型错误
-type PluggableList = any[];
 
 interface ArticleContentProps {
   content: string;
@@ -17,36 +12,6 @@ interface ImageZoomState {
   isOpen: boolean;
   src: string;
   alt: string;
-}
-
-function rehypeHeadingIds(): PluggableList[0] {
-  return function transformer(tree: any) {
-    const seen = new Map<string, number>();
-
-    function visit(nodes: any[]) {
-      for (const node of nodes) {
-        if (node.type === "element" && /^h[1-6]$/.test(node.tagName)) {
-          const text = node.children
-            .filter((c: any) => c.type === "text")
-            .map((c: any) => c.value)
-            .join("");
-
-          const base = generateHeadingId(text);
-          const count = seen.get(base) || 0;
-          seen.set(base, count + 1);
-          node.properties = node.properties || {};
-          node.properties.id = count === 0 ? base : `${base}-${count}`;
-        }
-
-        if (node.children && Array.isArray(node.children)) {
-          visit(node.children);
-        }
-      }
-    }
-
-    visit(tree.children || []);
-    return tree;
-  };
 }
 
 mermaid.initialize({
@@ -73,21 +38,22 @@ export default function ArticleContent({ content }: ArticleContentProps) {
     document.body.style.overflow = "";
   }, []);
 
-  const rehypePlugins = useMemo(() => [rehypeHeadingIds], []);
+  useEffect(() => {
+    if (!contentRef.current) return;
 
-  const components: Components = useMemo(
-    () => ({
-      img: ({ src, alt }) => (
-        <img
-          src={src as string}
-          alt={alt || ""}
-          style={{ cursor: "zoom-in" }}
-          onClick={() => openZoom((src as string) || "", alt || "")}
-        />
-      )
-    }),
-    [openZoom]
-  );
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.tagName === "IMG" && target.closest(".markdown-content")) {
+        const img = target as HTMLImageElement;
+        openZoom(img.src || "", img.alt || "");
+      }
+    };
+
+    contentRef.current.addEventListener("click", handleClick);
+    return () => {
+      contentRef.current?.removeEventListener("click", handleClick);
+    };
+  }, [openZoom]);
 
   const renderMermaidDiagrams = useCallback(async () => {
     if (!contentRef.current) return;
@@ -127,18 +93,12 @@ export default function ArticleContent({ content }: ArticleContentProps) {
     return null;
   }
 
+  const renderedHtml = renderMarkdown(content);
+
   return (
     <>
       <article className="post-content">
-        <div ref={contentRef} className="markdown-content">
-          <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
-            rehypePlugins={rehypePlugins}
-            components={components}
-          >
-            {content}
-          </ReactMarkdown>
-        </div>
+        <div ref={contentRef} className="markdown-content" dangerouslySetInnerHTML={{ __html: renderedHtml }} />
       </article>
 
       {zoomState.isOpen && (

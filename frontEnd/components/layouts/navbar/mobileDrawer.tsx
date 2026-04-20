@@ -32,6 +32,14 @@ export default function MobileDrawer({
   return (
     <div className={`drawer-overlay${open ? " open" : ""}`} onClick={onClose}>
       <div className="drawer-container" onClick={(event) => event.stopPropagation()}>
+        <div className="avatar-img">
+          <img
+            src={siteData.basicConfig.authorAvatar || "/avatar.webp"}
+            alt="avatar"
+            loading="lazy"
+          />
+        </div>
+
         <div className="site-data">
           <Link href="/archive" onClick={onClose}>
             <div className="headline">文章</div>

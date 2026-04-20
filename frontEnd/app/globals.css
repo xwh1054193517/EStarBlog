@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import "./markdown.css";
+@import "highlight.js/styles/atom-one-dark.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -39,6 +41,10 @@
   --estar-radius-md: 12px;
   --estar-radius-lg: 16px;
   --estar-radius-full: 9999px;
+
+  /* FlecBlog 兼容变量 */
+  --estar-btn: #49b1f5;
+  --estar-btn-hover: #78c2f4ff;
 
   --background: 0 0% 100%;
   --foreground: 0 0% 3.9%;
@@ -85,6 +91,10 @@
   --estar-footer-font: #b8b8b8;
   --estar-footer-font-hover: #eee;
   --estar-footer-font-bg-hover: #383838;
+
+  /* FlecBlog 兼容变量 */
+  --estar-btn: #1f1f1f;
+  --estar-hover: #787878;
 
   --background: 0 0% 0%;
   --foreground: 0 0% 95%;

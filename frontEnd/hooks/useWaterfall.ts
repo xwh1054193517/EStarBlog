@@ -5,6 +5,7 @@ export interface WaterfallOptions {
   columns?: number;
   gap?: number;
   debounceDelay?: number;
+  waitForImages?: boolean;
   breakpoints?: {
     mobile: number;
     tablet: number;
@@ -16,7 +17,8 @@ export function useWaterfall(options: WaterfallOptions) {
     containerSelector,
     columns = 3,
     gap = 15,
-    debounceDelay = 200,
+    debounceDelay = 150,
+    waitForImages = true,
     breakpoints = { mobile: 768, tablet: 1200 }
   } = options;
 
@@ -38,26 +40,21 @@ export function useWaterfall(options: WaterfallOptions) {
     };
 
     const waitForImagesLoad = (): Promise<void> => {
-      return new Promise((resolve) => {
-        setTimeout(resolve, 0);
-        const images = document.querySelectorAll(`${optionsRef.current.containerSelector} img`);
-        if (images.length === 0) return resolve();
+      const images = document.querySelectorAll(`${optionsRef.current.containerSelector} img`);
+      if (images.length === 0) return Promise.resolve();
 
-        let loadedCount = 0;
-        const checkDone = () => {
-          loadedCount++;
-          if (loadedCount >= images.length) resolve();
-        };
-
-        images.forEach((img) => {
+      const imagePromises = Array.from(images).map((img) => {
+        return new Promise<void>((resolve) => {
           if ((img as HTMLImageElement).complete) {
-            checkDone();
+            resolve();
           } else {
-            img.addEventListener("load", checkDone, { once: true });
-            img.addEventListener("error", checkDone, { once: true });
+            img.addEventListener("load", () => resolve(), { once: true });
+            img.addEventListener("error", () => resolve(), { once: true });
           }
         });
       });
+
+      return Promise.all(imagePromises).then(() => {});
     };
 
     const waterfallLayout = () => {
@@ -67,49 +64,35 @@ export function useWaterfall(options: WaterfallOptions) {
       const items = Array.from(container.children) as HTMLElement[];
       if (items.length === 0) return;
 
-      // Reset all inline styles first
-      items.forEach((item) => {
-        item.style.position = "";
-        item.style.left = "";
-        item.style.top = "";
-        item.style.width = "";
-        item.style.height = "";
-      });
-      container.style.height = "";
-
       const containerWidth = container.clientWidth;
       const cols = getColumns();
       const columnWidth = (containerWidth - gap * (cols - 1)) / cols;
 
-      requestAnimationFrame(() => {
-        const columnsHeight: number[] = new Array(cols).fill(0);
+      const columnsHeight: number[] = new Array(cols).fill(0);
+      const itemHeights = items.map((item) => item.offsetHeight);
 
-        items.forEach((item) => {
-          const minHeight = Math.min(...columnsHeight);
-          const columnIndex = columnsHeight.indexOf(minHeight);
+      items.forEach((item, index) => {
+        const minHeight = Math.min(...columnsHeight);
+        const columnIndex = columnsHeight.indexOf(minHeight);
 
-          item.style.position = "absolute";
-          item.style.width = `${columnWidth}px`;
-          item.style.left = `${columnIndex * (columnWidth + gap)}px`;
-          item.style.top = `${minHeight}px`;
+        item.style.width = `${columnWidth}px`;
+        item.style.position = "absolute";
+        item.style.left = `${columnIndex * (columnWidth + gap)}px`;
+        item.style.top = `${minHeight}px`;
 
-          columnsHeight[columnIndex] = minHeight + item.offsetHeight + gap;
-        });
-
-        const maxHeight = Math.max(...columnsHeight) - gap;
-        container.style.height = `${maxHeight}px`;
+        columnsHeight[columnIndex] =
+          minHeight + (itemHeights[index] || 0) + gap;
       });
+
+      const containerHeight = Math.max(...columnsHeight);
+      container.style.height = `${containerHeight}px`;
+
+      if (!isLayoutReady) {
+        setIsLayoutReady(true);
+      }
     };
 
-    const runLayout = async () => {
-      await waitForImagesLoad();
-      waterfallLayout();
-      setIsLayoutReady(true);
-    };
-
-    runLayout();
-
-    const handleResize = () => {
+    const debouncedLayout = () => {
       if (debounceTimerRef.current) {
         clearTimeout(debounceTimerRef.current);
       }
@@ -118,12 +101,67 @@ export function useWaterfall(options: WaterfallOptions) {
       }, optionsRef.current.debounceDelay);
     };
 
+    const imageLoadListeners: Array<{
+      img: HTMLImageElement;
+      listener: () => void;
+    }> = [];
+
+    const cleanupImageListeners = () => {
+      imageLoadListeners.forEach(({ img, listener }) => {
+        img.removeEventListener("load", listener);
+      });
+      imageLoadListeners.length = 0;
+    };
+
+    const setupImageLoadListeners = () => {
+      cleanupImageListeners();
+
+      const container = document.querySelector(optionsRef.current.containerSelector);
+      if (!container) return;
+
+      const images = container.querySelectorAll("img");
+      images.forEach((img) => {
+        const htmlImg = img as HTMLImageElement;
+        if (!htmlImg.complete) {
+          const listener = () => debouncedLayout();
+          htmlImg.addEventListener("load", listener);
+          imageLoadListeners.push({ img: htmlImg, listener });
+        }
+      });
+    };
+
+    const waterfall = async () => {
+      setIsLayoutReady(false);
+      cleanupImageListeners();
+
+      if (waitForImages) {
+        await waitForImagesLoad();
+      }
+
+      waterfallLayout();
+      setupImageLoadListeners();
+    };
+
+    waterfall();
+
+    const handleResize = () => debouncedLayout();
     window.addEventListener("resize", handleResize);
+
+    let resizeObserver: ResizeObserver | null = null;
+    const containerEl = document.querySelector(containerSelector) as HTMLElement;
+    if (containerEl) {
+      resizeObserver = new ResizeObserver(debouncedLayout);
+      resizeObserver.observe(containerEl);
+    }
 
     return () => {
       window.removeEventListener("resize", handleResize);
       if (debounceTimerRef.current) {
         clearTimeout(debounceTimerRef.current);
+      }
+      cleanupImageListeners();
+      if (resizeObserver) {
+        resizeObserver.disconnect();
       }
     };
   }, [containerSelector, columns, gap, debounceDelay, breakpoints.mobile, breakpoints.tablet]);
