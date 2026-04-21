@@ -31,7 +31,7 @@ export default function TagsCard({ tags }: { tags: TagItem[] }) {
       </div>
       <div
         ref={tagCloudRef}
-        className={`card-tag-cloud is-expanded${needsExpand ? " can-expand" : ""}${isExpanded ? " is-expanded" : ""}`}
+        className={`card-tag-cloud${needsExpand ? " can-expand" : ""}${isExpanded ? " is-expanded" : ""}`}
       >
         {tags.map((tag) => (
           <Link key={tag.slug} href={tag.url} style={{ fontSize: getTagFontSize(tag, tags) }}>

@@ -1,25 +1,14 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 
 import { QueryProvider } from "@/components/providers/QueryProvider";
+import ThemeScript from "@/components/providers/ThemeScript";
+import TrackerScript from "@/components/providers/TrackerScript";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "恒星博客",
   description: "一个长期更新的技术博客，记录思考、技术、生活。"
 };
-
-const themeSetScrip = `
-  (function () {
-    try {
-      var stored = localStorage.getItem('theme');
-      var dark = stored ? stored === 'dark' : true;
-      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
-    } catch (error) {
-      document.documentElement.setAttribute('data-theme', 'light');
-    }
-  })();
-`;
 
 export default function RootLayout({
   children
@@ -31,11 +20,10 @@ export default function RootLayout({
       <head>
         {/* Remix Icon - 本地加载，避免CDN阻塞 */}
         <link rel="stylesheet" href="/fonts/remixicon.css" />
-        <Script id="theme-init" strategy="beforeInteractive">
-          {themeSetScrip}
-        </Script>
       </head>
       <body>
+        <ThemeScript />
+        <TrackerScript />
         <QueryProvider>{children}</QueryProvider>
       </body>
     </html>

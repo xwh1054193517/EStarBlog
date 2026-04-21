@@ -130,6 +130,8 @@ export async function getArticles(params?: {
   keyword?: string;
   category?: string;
   tag?: string;
+  year?: string;
+  month?: string;
 }): Promise<ArticleListResult> {
   const searchParams = new URLSearchParams();
   if (params?.page) searchParams.set("page", String(params.page));
@@ -137,6 +139,8 @@ export async function getArticles(params?: {
   if (params?.keyword) searchParams.set("keyword", params.keyword);
   if (params?.category) searchParams.set("category", params.category);
   if (params?.tag) searchParams.set("tag", params.tag);
+  if (params?.year) searchParams.set("year", params.year);
+  if (params?.month) searchParams.set("month", params.month);
 
   const queryString = searchParams.toString();
   const url = `${API_BASE_URL}/posts${queryString ? `?${queryString}` : ""}`;
@@ -200,6 +204,8 @@ export function useArticles(params?: {
   pageSize?: number;
   category?: string;
   tag?: string;
+  year?: string;
+  month?: string;
 }) {
   return useQuery<ArticleListResult>({
     queryKey: ["articles", params],
@@ -271,7 +277,7 @@ export interface AdminPostQuery {
 }
 
 export async function getAdminPosts(query?: AdminPostQuery): Promise<AdminPostListResponse> {
-  const response = await api.post<AdminPostListResponse>("/admin/posts", query);
+  const response = await api.post<AdminPostListResponse>("/admin/posts/list", query);
   return {
     items: response.items || [],
     pagination: response.pagination || {
