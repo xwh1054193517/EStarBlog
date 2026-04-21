@@ -59,7 +59,7 @@ export class PostsController {
     return this.postsService.incrementView(slug);
   }
 
-  @Post('admin/posts')
+  @Post('admin/posts/list')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   @ApiBearerAuth()
@@ -69,10 +69,11 @@ export class PostsController {
     return this.postsService.listAdmin(query);
   }
 
-  @Get('admin/posts/:id')
+  @Get('admin/posts/list/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get admin post by id' })
   @ApiOkResponse({ type: PostEntity })
   findAdminById(@Param('id') id: string) {
     return this.postsService.findAdminById(id);
@@ -82,6 +83,8 @@ export class PostsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   @ApiBearerAuth()
+  @ApiOperation({ summary: 'Create a new post' })
+  @ApiOkResponse({ type: PostEntity })
   create(
     @Body() dto: CreatePostDto,
     @getCurrentUserDec() user: AccessTokenPayload,

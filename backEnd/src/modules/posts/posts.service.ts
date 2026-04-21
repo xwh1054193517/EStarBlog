@@ -254,6 +254,17 @@ export class PostsService {
       tagIds = tags.map((t) => t.id);
     }
 
+    const dateFilter = (() => {
+      if (!query.year && !query.month) return null;
+      const year = query.year || String(new Date().getFullYear());
+      const month = query.month ? String(query.month).padStart(2, '0') : '01';
+      const day = query.month ? '31' : '01';
+      return {
+        gte: new Date(`${year}-${month}-01T00:00:00.000Z`),
+        lt: new Date(`${year}-${month}-${day}T23:59:59.999Z`),
+      };
+    })();
+
     const where: Prisma.PostWhereInput = {
       ...(includeDrafts
         ? query.published !== undefined
@@ -273,6 +284,7 @@ export class PostsService {
         ? { tags: { some: { tagId: { in: tagIds } } } }
         : {}),
       ...(query.featured !== undefined ? { featured: query.featured } : {}),
+      ...(dateFilter ? { publishedAt: dateFilter } : {}),
     };
     const [items, total] = await Promise.all([
       this.prisma.post.findMany({

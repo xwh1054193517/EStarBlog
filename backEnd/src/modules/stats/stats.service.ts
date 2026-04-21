@@ -20,6 +20,7 @@ export class StatsService {
     const [totalVisitors, totalPageViews] = await Promise.all([
       this.redisService.pfadd(STATS_KEYS.TOTAL_VISITORS, visitorId),
       this.redisService.incrby(STATS_KEYS.TOTAL_PAGE_VIEWS, 1),
+      this.presenceService.heartbeat(visitorId),
     ]);
     return { totalVisitors, totalPageViews };
   }

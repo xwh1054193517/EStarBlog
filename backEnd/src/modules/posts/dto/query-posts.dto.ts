@@ -39,6 +39,16 @@ export class QueryPostsDto extends PaginationQueryDto {
 
   @ApiPropertyOptional()
   @IsOptional()
+  @IsString()
+  year?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  month?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
   @Transform(({ value }) => {
     if (value === 'true') return true;
     if (value === 'false') return false;
