@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOkResponse,
@@ -23,6 +23,12 @@ export class StatsController {
   @ApiOkResponse({ type: SiteStatsEntity })
   getSiteStats() {
     return this.statsService.getSiteStats();
+  }
+
+  @Post('stats/track')
+  @ApiOperation({ summary: 'Track page view' })
+  trackView(@Body() body: { visitorId: string; path?: string }) {
+    return this.statsService.trackView(body.visitorId, body.path);
   }
 
   @Get('admin/stats/dashboard')

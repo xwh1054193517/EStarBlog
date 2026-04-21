@@ -12,4 +12,13 @@ export class SiteStatsEntity {
 
   @ApiProperty()
   onlineUsers: number;
+
+  @ApiProperty()
+  totalVisitors: number;
+
+  @ApiProperty()
+  totalPageViews: number;
+
+  @ApiProperty()
+  totalWords: number;
 }

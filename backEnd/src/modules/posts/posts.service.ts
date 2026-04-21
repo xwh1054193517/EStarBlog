@@ -234,21 +234,24 @@ export class PostsService {
     const page = query.page ?? 1;
     const pageSize = query.pageSize ?? 10;
 
-    let categoryId = query.categoryId;
-    let tagId = query.tagId;
+    let categoryId: string | undefined;
+    let tagIds: string[] = [];
 
-    if (query.category && !categoryId) {
+    if (query.category) {
       const category = await this.prisma.category.findUnique({
         where: { slug: query.category },
+        select: { id: true },
       });
       categoryId = category?.id;
     }
 
-    if (query.tag && !tagId) {
-      const tag = await this.prisma.tag.findUnique({
-        where: { slug: query.tag },
+    if (query.tag) {
+      const tagSlugs = Array.isArray(query.tag) ? query.tag : [query.tag];
+      const tags = await this.prisma.tag.findMany({
+        where: { slug: { in: tagSlugs } },
+        select: { id: true },
       });
-      tagId = tag?.id;
+      tagIds = tags.map((t) => t.id);
     }
 
     const where: Prisma.PostWhereInput = {
@@ -266,7 +269,10 @@ export class PostsService {
           }
         : {}),
       ...(categoryId ? { categoryId } : {}),
-      ...(tagId ? { tags: { some: { tagId } } } : {}),
+      ...(tagIds.length > 0
+        ? { tags: { some: { tagId: { in: tagIds } } } }
+        : {}),
+      ...(query.featured !== undefined ? { featured: query.featured } : {}),
     };
     const [items, total] = await Promise.all([
       this.prisma.post.findMany({

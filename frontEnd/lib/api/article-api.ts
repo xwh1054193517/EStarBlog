@@ -22,6 +22,28 @@ export interface ArticleListResult {
   };
 }
 
+export interface SearchArticleItem {
+  id: string;
+  title: string;
+  excerpt: string;
+  cover?: string;
+  url: string;
+  publishTime: string;
+  category?: {
+    id: number;
+    name: string;
+    url: string;
+  };
+}
+
+export interface SearchArticlesResult {
+  list: SearchArticleItem[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
 interface PostFromApi {
   id: string;
   title: string;
@@ -77,6 +99,24 @@ function convertPostToArticle(post: PostFromApi): Article {
   };
 }
 
+function convertPostToSearchArticle(post: PostFromApi): SearchArticleItem {
+  return {
+    id: post.id,
+    title: post.title,
+    excerpt: post.excerpt || "",
+    cover: post.coverImage || undefined,
+    url: `/posts/${post.slug}`,
+    publishTime: post.publishedAt || post.createdAt,
+    category: post.category
+      ? {
+          id: safeNumber(post.category.id),
+          name: post.category.name,
+          url: `/categories/${post.category.slug}`
+        }
+      : undefined
+  };
+}
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api";
 
 export async function getArticleCount(): Promise<number> {
@@ -118,6 +158,43 @@ export async function getArticles(params?: {
   };
 }
 
+export async function searchArticles(
+  keyword: string,
+  params?: {
+    page?: number;
+    pageSize?: number;
+  }
+): Promise<SearchArticlesResult> {
+  const searchParams = new URLSearchParams();
+  searchParams.set("keyword", keyword);
+  searchParams.set("page", String(params?.page ?? 1));
+  searchParams.set("pageSize", String(params?.pageSize ?? 5));
+
+  const queryString = searchParams.toString();
+  const url = `${API_BASE_URL}/posts?${queryString}`;
+
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to search articles: ${response.status}`);
+  }
+
+  const data = await response.json();
+  const pagination = data.pagination || {
+    page: params?.page || 1,
+    pageSize: params?.pageSize || 5,
+    total: 0,
+    totalPages: 0
+  };
+
+  return {
+    list: (data.items || []).map(convertPostToSearchArticle),
+    total: pagination.total,
+    page: pagination.page,
+    pageSize: pagination.pageSize,
+    totalPages: pagination.totalPages
+  };
+}
+
 export function useArticles(params?: {
   page?: number;
   pageSize?: number;
@@ -153,4 +230,76 @@ export function useArticle(slug: string) {
     },
     enabled: !!slug
   });
+}
+
+export interface AdminPostItem {
+  id: string;
+  title: string;
+  slug: string;
+  content: string;
+  excerpt: string | null;
+  coverImage: string | null;
+  published: boolean;
+  featured: boolean;
+  views: number;
+  readingTime: number | null;
+  publishedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  category: { id: string; name: string; slug: string } | null;
+  tags: { id: string; name: string; slug: string }[];
+}
+
+export interface AdminPostListResponse {
+  items: AdminPostItem[];
+  pagination: {
+    page: number;
+    pageSize: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+export interface AdminPostQuery {
+  page?: number;
+  pageSize?: number;
+  keyword?: string;
+  category?: string;
+  tag?: string[];
+  published?: boolean;
+  featured?: boolean;
+}
+
+export async function getAdminPosts(query?: AdminPostQuery): Promise<AdminPostListResponse> {
+  const response = await api.post<AdminPostListResponse>("/admin/posts", query);
+  return {
+    items: response.items || [],
+    pagination: response.pagination || {
+      page: query?.page || 1,
+      pageSize: query?.pageSize || 10,
+      total: 0,
+      totalPages: 0
+    }
+  };
+}
+
+export async function updatePost(
+  id: string,
+  data: {
+    title?: string;
+    content?: string;
+    excerpt?: string;
+    coverImage?: string;
+    published?: boolean;
+    featured?: boolean;
+    categoryId?: string;
+    tags?: string[];
+    publishedAt?: string;
+  }
+): Promise<AdminPostItem> {
+  return api.patch<AdminPostItem>(`/admin/posts/${id}`, data);
+}
+
+export async function deletePost(id: string): Promise<void> {
+  return api.delete<void>(`/admin/posts/${id}`);
 }

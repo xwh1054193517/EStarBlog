@@ -7,6 +7,9 @@ export interface DashboardStats {
   categoryCount: number;
   tagCount: number;
   onlineUsers: number;
+  totalVisitors: number;
+  totalPageViews: number;
+  totalWords: number;
 }
 
 export interface SiteStats {
@@ -14,6 +17,9 @@ export interface SiteStats {
   categoryCount: number;
   tagCount: number;
   onlineUsers: number;
+  totalVisitors: number;
+  totalPageViews: number;
+  totalWords: number;
 }
 
 export async function getDashboardStats(): Promise<DashboardStats> {

@@ -14,21 +14,21 @@ export default function Navbar({
 }) {
   const [isFixed, setIsFixed] = useState(false);
   const [isScrollingDown, setIsScrollingDown] = useState(false);
-  const [lastScrollY, setLastScrollY] = useState(0);
   const [showDrawer, setShowDrawer] = useState(false);
 
   useEffect(() => {
+    let lastScrollY = window.scrollY;
+
     const handleScroll = () => {
       const windowY = window.scrollY;
       setIsFixed(windowY > 0);
       setIsScrollingDown(windowY > lastScrollY);
-      setLastScrollY(windowY);
-      window.addEventListener("scroll", handleScroll, { passive: true });
-      return () => window.removeEventListener("scroll", handleScroll);
+      lastScrollY = windowY;
     };
+
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScrollY]);
+  }, []);
 
   return (
     <>

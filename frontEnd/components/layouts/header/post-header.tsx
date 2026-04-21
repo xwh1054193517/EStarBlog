@@ -82,10 +82,6 @@ export default function PostHeader({ article }: PostHeaderProps) {
             <i className="ri-eye-line"></i>
             <span>浏览量: {article.viewCount}</span>
           </span>
-          <span className="post-meta-item">
-            <i className="ri-message-3-line"></i>
-            <span>评论数: {article.commentCount}</span>
-          </span>
         </div>
 
         <div className="post-meta-desktop">
@@ -125,10 +121,6 @@ export default function PostHeader({ article }: PostHeaderProps) {
             <span className="post-meta-item">
               <i className="ri-eye-line"></i>
               <span>浏览量: {article.viewCount}</span>
-            </span>
-            <span className="post-meta-item">
-              <i className="ri-message-3-line"></i>
-              <span>评论数: {article.commentCount}</span>
             </span>
           </div>
         </div>

@@ -633,7 +633,6 @@ ol {
   font-weight: 700;
 }
 
-.search-modal-overlay,
 .drawer-overlay {
   position: fixed;
   inset: 0;
@@ -647,16 +646,6 @@ ol {
 .drawer-overlay.open {
   opacity: 1;
   pointer-events: auto;
-}
-
-.search-modal-overlay {
-  display: grid;
-  place-items: center;
-}
-
-.search-modal-card {
-  width: min(560px, calc(100vw - 32px));
-  padding: 24px;
 }
 
 .drawer-container {
@@ -675,6 +664,253 @@ ol {
 
 .drawer-overlay.open .drawer-container {
   transform: translateX(0);
+}
+
+.search-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: flex-start;
+  padding: 100px 20px;
+  overflow-y: auto;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+.search-modal.search-modal-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.search-modal-box {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 600px;
+  max-height: calc(100vh - 120px);
+  margin: 0 auto;
+  padding: 20px;
+  background: var(--estar-card-bg);
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.search-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.search-modal-title {
+  color: var(--estar-font);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.search-modal-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  color: var(--estar-meta);
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.search-modal-close:hover {
+  background: var(--estar-page-bg);
+  transform: rotate(90deg);
+}
+
+.search-modal-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  background: var(--estar-page-bg);
+  border: 2px solid transparent;
+  border-radius: 8px;
+  transition: border-color 0.3s;
+}
+
+.search-modal-search:focus-within {
+  border-color: var(--estar-theme);
+}
+
+.search-modal-search input {
+  flex: 1;
+  padding-right: 30px;
+  color: var(--estar-font);
+  font-size: 0.95rem;
+  background: none;
+  border: none;
+  outline: none;
+}
+
+.search-modal-search input::placeholder {
+  color: var(--estar-meta);
+}
+
+.search-loading-icon {
+  position: absolute;
+  right: 12px;
+  color: var(--estar-theme);
+  font-size: 1.1rem;
+}
+
+.search-modal-results {
+  flex: 1;
+  margin-top: 16px;
+  overflow-y: auto;
+}
+
+.search-modal-loading,
+.search-modal-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: var(--estar-meta);
+}
+
+.search-modal-loading i,
+.search-modal-empty i {
+  margin-bottom: 8px;
+  font-size: 2rem;
+  opacity: 0.5;
+}
+
+.search-modal-empty p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.search-modal-item {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 8px;
+  padding: 10px;
+  color: inherit;
+  text-decoration: none;
+  background: var(--estar-page-bg);
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.search-modal-item:hover {
+  background: rgba(73, 177, 245, 0.12);
+}
+
+.search-modal-item img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border-radius: 4px;
+}
+
+.search-modal-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.search-modal-info h3 {
+  margin: 0 0 4px;
+  overflow: hidden;
+  color: var(--estar-font);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.search-modal-excerpt {
+  display: -webkit-box;
+  margin: 0 0 6px;
+  overflow: hidden;
+  color: var(--estar-meta);
+  font-size: 0.8rem;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.search-modal-info mark,
+.search-modal-excerpt mark {
+  padding: 0 2px;
+  color: inherit;
+  background: rgba(255, 235, 59, 0.4);
+  border-radius: 2px;
+}
+
+.search-modal-meta {
+  display: flex;
+  gap: 8px;
+  color: var(--estar-meta);
+  font-size: 0.75rem;
+}
+
+.search-modal-meta span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.search-modal-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px 0 4px;
+  color: var(--estar-font);
+  font-size: 0.85rem;
+}
+
+.search-modal-pagination button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  color: var(--estar-font);
+  background: var(--estar-page-bg);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.search-modal-pagination button:hover:not(:disabled) {
+  color: #fff;
+  background: var(--estar-btn-hover);
+}
+
+.search-modal-pagination button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .avatar-img {
@@ -3476,6 +3712,29 @@ html[data-reading-mode="true"] .main-content {
   .tags-chart__bars {
     gap: 12px;
   }
+
+  .search-modal {
+    padding: 80px 12px;
+  }
+
+  .search-modal-box {
+    padding: 16px;
+  }
+
+  .search-modal-item img {
+    width: 50px;
+    height: 50px;
+  }
+
+  .search-modal-info h3 {
+    font-size: 0.85rem;
+  }
+
+  .search-modal-meta {
+    flex-direction: column;
+    gap: 2px;
+    font-size: 0.7rem;
+  }
 }
 
 @media screen and (max-width: 768px) {
@@ -4916,6 +5175,112 @@ html[data-reading-mode="true"] .main-content {
     position: static;
   }
   #sidebar .card-widget:has(.toc-list) {
+    display: none;
+  }
+}
+
+/* ========== 侧边栏卡片折叠样式（移动端） ========== */
+.collapse-icon {
+  display: none;
+  margin-left: 8px;
+  cursor: pointer;
+  font-size: 1.2em;
+  transition: transform 0.3s ease;
+}
+
+.collapse-icon.is-expanded {
+  transform: rotate(-90deg);
+}
+
+@media screen and (max-width: 900px) {
+  .collapse-icon {
+    display: inline-block;
+  }
+
+  .item-headline {
+    padding-bottom: 0 !important;
+    transition: padding-bottom 0.3s ease;
+  }
+
+  .item-headline.is-expanded {
+    padding-bottom: 8px !important;
+  }
+
+  .card-list,
+  .card-tag-cloud {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+
+  .card-list.is-expanded,
+  .card-tag-cloud.is-expanded {
+    max-height: 1000px;
+  }
+}
+
+/* ========== 标签云特殊样式（桌面端展开更多） ========== */
+.card-tag-cloud a {
+  font-size: 1.1em;
+  color: #666;
+  display: inline-block;
+  padding: 0 4px;
+  line-height: 1.8;
+  transition: color 0.3s;
+}
+
+.card-tag-cloud a:hover {
+  color: var(--estar-btn-hover);
+}
+
+.card-tag-cloud.can-expand:not(.is-expanded) {
+  max-height: 200px;
+  overflow: hidden;
+  position: relative;
+}
+
+.card-tag-cloud.can-expand:not(.is-expanded)::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 30px;
+  background: linear-gradient(to bottom, transparent, var(--estar-card-bg));
+  pointer-events: none;
+}
+
+.card-tag-cloud.is-expanded {
+  max-height: none;
+}
+
+.expand-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 8px;
+  color: #999;
+  font-size: 0.9em;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.expand-toggle:hover {
+  color: var(--estar-btn-hover);
+}
+
+@media screen and (max-width: 900px) {
+  .expand-toggle {
+    display: none;
+  }
+
+  .card-tag-cloud.can-expand:not(.is-expanded) {
+    max-height: none;
+    overflow: visible;
+  }
+
+  .card-tag-cloud.can-expand:not(.is-expanded)::after {
     display: none;
   }
 }

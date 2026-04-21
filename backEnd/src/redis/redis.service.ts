@@ -96,10 +96,19 @@ export class RedisService implements OnModuleDestroy {
 
   async getdel(key: string) {
     const client = await this.getClient();
-
-    // ioredis 没有始终稳定暴露 getdel 方法时，直接走原生命令最稳
     return client.call('GETDEL', key) as Promise<string | null>;
   }
+
+  async pfadd(key: string, ...elements: string[]) {
+    const client = await this.getClient();
+    return client.pfadd(key, ...elements);
+  }
+
+  async pfcount(key: string) {
+    const client = await this.getClient();
+    return client.pfcount(key) as Promise<number>;
+  }
+
   async onModuleDestroy() {
     await this.client.quit().catch(() => undefined);
   }

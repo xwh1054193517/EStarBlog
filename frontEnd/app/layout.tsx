@@ -30,10 +30,7 @@ export default function RootLayout({
     <html lang="zh-CN" data-theme="dark" data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         {/* Remix Icon - 本地加载，避免CDN阻塞 */}
-        <link
-          rel="stylesheet"
-          href="/fonts/remixicon.css"
-        />
+        <link rel="stylesheet" href="/fonts/remixicon.css" />
         <Script id="theme-init" strategy="beforeInteractive">
           {themeSetScrip}
         </Script>

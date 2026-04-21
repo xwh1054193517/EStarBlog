@@ -59,13 +59,13 @@ export class PostsController {
     return this.postsService.incrementView(slug);
   }
 
-  @Get('admin/posts')
+  @Post('admin/posts')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'List admin posts' })
   @ApiOkResponse({ type: PostListEntity })
-  listAdmin(@Query() query: QueryPostsDto) {
+  listAdmin(@Body() query: QueryPostsDto) {
     return this.postsService.listAdmin(query);
   }
 

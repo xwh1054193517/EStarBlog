@@ -23,8 +23,8 @@ export default function Sidebar({ siteData, isArticlePage = false, toc = [] }: S
           <>
             <CategoriesCard categories={siteData.categories} />
             <TagsCard tags={siteData.tags} />
-            <ArchivesCard archives={siteData.archives} />
-            {/* <WebInfoCard stats={siteData.siteStats} established={siteData.blogConfig.established} /> */}
+            <ArchivesCard />
+            <WebInfoCard />
           </>
         )}
       </div>

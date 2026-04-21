@@ -80,8 +80,7 @@ export function useWaterfall(options: WaterfallOptions) {
         item.style.left = `${columnIndex * (columnWidth + gap)}px`;
         item.style.top = `${minHeight}px`;
 
-        columnsHeight[columnIndex] =
-          minHeight + (itemHeights[index] || 0) + gap;
+        columnsHeight[columnIndex] = minHeight + (itemHeights[index] || 0) + gap;
       });
 
       const containerHeight = Math.max(...columnsHeight);
