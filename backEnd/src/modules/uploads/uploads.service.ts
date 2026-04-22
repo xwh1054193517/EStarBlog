@@ -63,9 +63,9 @@ export class UploadsService implements OnModuleInit {
 
     this.bucket = this.configService.get<string>('MINIO_BUCKET', 'app-files');
 
-    this.publicUrl = this.configService
+    this.publicUrl = `${this.configService
       .get<string>('MINIO_PUBLIC_BASE_URL', '')
-      .replace(/\/+$/, '');
+      .replace(/\/+$/, '')}/${this.bucket}`;
 
     const publicBaseUrl = this.configService.get<string>(
       'MINIO_PUBLIC_BASE_URL',
@@ -210,6 +210,7 @@ export class UploadsService implements OnModuleInit {
       size: file.size,
       mimeType: file.mimetype,
       previewUrl,
+      url,
     };
   }
 
@@ -334,7 +335,7 @@ export class UploadsService implements OnModuleInit {
     );
 
     const stat = await this.statFile(dto.objectName);
-    const previewUrl = await this.getPublicPresignedUrl(dto.objectName, 3600);
+    const previewUrl = await this.getPresignedDownloadUrl(dto.objectName, 3600);
     const url = this.buildPublicFileUrl(dto.objectName);
 
     if (createdById) {
@@ -359,6 +360,7 @@ export class UploadsService implements OnModuleInit {
       size: stat.size,
       mimeType: stat.contentType,
       previewUrl,
+      url,
     };
   }
 
