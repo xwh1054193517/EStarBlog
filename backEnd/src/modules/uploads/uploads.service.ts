@@ -46,6 +46,7 @@ export class UploadsService implements OnModuleInit {
   ]);
 
   private readonly publicUrl: string;
+  private readonly publicEndpoint: string;
 
   constructor(
     private readonly configService: ConfigService,
@@ -62,12 +63,24 @@ export class UploadsService implements OnModuleInit {
 
     this.bucket = this.configService.get<string>('MINIO_BUCKET', 'app-files');
 
-    this.publicUrl =
-      this.configService
-        .get<string>('MINIO_PUBLIC_BASE_URL', '')
-        .replace(/\/+$/, '') ||
-      this.configService.get<string>('MINIO_PUBLIC_URL', '').replace(/\/+$/, '') ||
-      `${protocol}://${endpoint}:${port}/${this.bucket}`;
+    this.publicUrl = this.configService
+      .get<string>('MINIO_PUBLIC_BASE_URL', '')
+      .replace(/\/+$/, '');
+
+    const publicBaseUrl = this.configService.get<string>(
+      'MINIO_PUBLIC_BASE_URL',
+      '',
+    );
+    if (publicBaseUrl) {
+      try {
+        const publicParsed = new URL(publicBaseUrl);
+        this.publicEndpoint = `${publicParsed.protocol}//${publicParsed.host}`;
+      } catch {
+        this.publicEndpoint = `${protocol}://${endpoint}:${port}`;
+      }
+    } else {
+      this.publicEndpoint = `${protocol}://${endpoint}:${port}`;
+    }
 
     this.s3 = new S3Client({
       region: this.configService.get<string>('MINIO_REGION', 'us-east-1'),
@@ -132,6 +145,21 @@ export class UploadsService implements OnModuleInit {
 
     return getSignedUrl(this.s3, command, { expiresIn });
   }
+
+  async getPublicPresignedUrl(objectName: string, expiresIn = 3600) {
+    const command = new GetObjectCommand({
+      Bucket: this.bucket,
+      Key: objectName,
+    });
+
+    const signedUrl = await getSignedUrl(this.s3, command, { expiresIn });
+
+    if (this.publicUrl && this.publicEndpoint) {
+      return signedUrl.replace(this.publicEndpoint, this.publicUrl);
+    }
+
+    return signedUrl;
+  }
   // 上传小文件
   // 支持的文件类型：image/jpeg, image/png, image/webp, image/gif, application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, text/plain
   async uploadSmallFile(
@@ -156,7 +184,7 @@ export class UploadsService implements OnModuleInit {
       }),
     );
 
-    const previewUrl = await this.getPresignedDownloadUrl(objectName, 3600);
+    const previewUrl = await this.getPublicPresignedUrl(objectName, 3600);
     const url = this.buildPublicFileUrl(objectName);
 
     if (createdById) {
@@ -306,7 +334,7 @@ export class UploadsService implements OnModuleInit {
     );
 
     const stat = await this.statFile(dto.objectName);
-    const previewUrl = await this.getPresignedDownloadUrl(dto.objectName, 3600);
+    const previewUrl = await this.getPublicPresignedUrl(dto.objectName, 3600);
     const url = this.buildPublicFileUrl(dto.objectName);
 
     if (createdById) {
