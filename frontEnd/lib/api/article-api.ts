@@ -144,13 +144,16 @@ export async function getArticles(params?: {
 
   const queryString = searchParams.toString();
   const url = `${API_BASE_URL}/posts${queryString ? `?${queryString}` : ""}`;
+  console.warn("url", url);
 
   const response = await fetch(url);
+
   if (!response.ok) {
     throw new Error(`Failed to fetch articles: ${response.status}`);
   }
 
   const data = await response.json();
+  console.warn("data", data);
   return {
     items: (data.items || []).map(convertPostToArticle),
     pagination: data.pagination || {
@@ -236,6 +239,14 @@ export function useArticle(slug: string) {
     },
     enabled: !!slug
   });
+}
+
+export async function incrementArticleView(slug: string): Promise<void> {
+  try {
+    await api.post(`/posts/${slug}/views`);
+  } catch (error) {
+    console.warn("Failed to increment article view:", error);
+  }
 }
 
 export interface AdminPostItem {

@@ -1,10 +1,12 @@
+"use client";
+
 import ArchivesCard from "@/components/layouts/sidebar/ArchivesCard";
 import AuthorCard from "@/components/layouts/sidebar/AuthorCard";
 import CategoriesCard from "@/components/layouts/sidebar/CategoriesCard";
 import TagsCard from "@/components/layouts/sidebar/TagsCard";
 import TocCard from "@/components/layouts/sidebar/TocCard";
 import WebInfoCard from "@/components/layouts/sidebar/WebInfoCard";
-import type { Article, SiteData, TocItem } from "@/lib/types";
+import type { SiteData, TocItem } from "@/lib/types";
 
 interface SidebarProps {
   siteData: SiteData;

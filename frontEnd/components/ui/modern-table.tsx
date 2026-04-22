@@ -373,156 +373,175 @@ export function ModernTable<T = unknown>({
         {!showTableLoading &&
           !showTableError &&
           (data.length > 0 || filterable || Object.keys(filters).length > 0) && (
-            <>
-              {/* 表头 */}
-              <div className="space-y-2">
-                <div className="flex items-center space-x-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {selectable && (
-                    <div className="w-8">
-                      <Checkbox
-                        checked={selectedIds.length === data.length && data.length > 0}
-                        onCheckedChange={handleSelectAll}
-                        className="rounded-md"
-                      />
-                    </div>
-                  )}
-                  {columns.map((column) => (
-                    <div
-                      key={column.key}
-                      className={cn(
-                        column.width || "flex-1",
-                        column.className,
-                        "flex items-center space-x-2"
-                      )}
-                    >
-                      <span>{column.title}</span>
-                      {filterable && column.filter && (
-                        <TableFilter
-                          columnKey={column.key}
-                          columnTitle={column.title}
-                          filterType={column.filter.type}
-                          options={column.filter.options}
-                          placeholder={column.filter.placeholder}
-                          currentValue={filters[column.key]}
-                          onFilterChange={handleFilterChange}
-                          onApply={closePopover}
-                          onReset={clearFilter}
-                          onOpen={openPopover}
-                          onClose={closePopover}
-                          isOpen={openPopovers[column.key] || false}
+            <div className="modern-table__viewport overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+              <div className="modern-table__grid min-w-[700px]">
+                {/* 表头 */}
+                <div className="modern-table__header-wrap space-y-2 mb-2">
+                  <div className="modern-table__header flex items-center space-x-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {selectable && (
+                      <div className="modern-table__header-selection w-8">
+                        <Checkbox
+                          checked={selectedIds.length === data.length && data.length > 0}
+                          onCheckedChange={handleSelectAll}
+                          className="rounded-md"
                         />
-                      )}
-                    </div>
-                  ))}
-                  {actions.length > 0 && <div className="w-12 text-center">操作</div>}
+                      </div>
+                    )}
+                    {columns.map((column) => (
+                      <div
+                        key={column.key}
+                        className={cn(
+                          "modern-table__header-cell",
+                          column.width || "flex-1",
+                          column.className,
+                          "flex shrink-0 items-center space-x-2"
+                        )}
+                      >
+                        <span>{column.title}</span>
+                        {filterable && column.filter && (
+                          <TableFilter
+                            columnKey={column.key}
+                            columnTitle={column.title}
+                            filterType={column.filter.type}
+                            options={column.filter.options}
+                            placeholder={column.filter.placeholder}
+                            currentValue={filters[column.key]}
+                            onFilterChange={handleFilterChange}
+                            onApply={closePopover}
+                            onReset={clearFilter}
+                            onOpen={openPopover}
+                            onClose={closePopover}
+                            isOpen={openPopovers[column.key] || false}
+                          />
+                        )}
+                      </div>
+                    ))}
+                    {actions.length > 0 && <div className="w-12 text-center">操作</div>}
+                  </div>
                 </div>
-              </div>
 
-              {/* 数据行 */}
-              {data.length === 0 ? (
-                <Card>
-                  <CardContent className="text-center py-8">
-                    <div className="text-gray-500 dark:text-gray-400">
-                      <Filter className="h-8 w-8 mx-auto mb-2 text-gray-400 dark:text-gray-500" />
-                      <p className="text-sm">没有找到匹配筛选条件的数据</p>
-                      <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                        请尝试调整筛选条件
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              ) : (
-                data.map((record) => {
-                  const recordId = getRecordId(record);
-                  return (
-                    <Card key={recordId} className="overflow-hidden hover:shadow-md">
-                      <CardContent className="p-4">
-                        <div className="flex items-center space-x-4">
-                          {selectable && (
-                            <div>
-                              <Checkbox
-                                checked={selectedIds.includes(recordId)}
-                                onCheckedChange={(checked) => {
-                                  handleSelectRecord(recordId, checked);
-                                }}
-                                className="rounded-md"
-                              />
-                            </div>
-                          )}
+                {/* 数据行 */}
+                {data.length === 0 ? (
+                  <Card>
+                    <CardContent className="text-center py-8">
+                      <div className="text-gray-500 dark:text-gray-400">
+                        <Filter className="h-8 w-8 mx-auto mb-2 text-gray-400 dark:text-gray-500" />
+                        <p className="text-sm">没有找到匹配筛选条件的数据</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                          请尝试调整筛选条件
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <div className="space-y-2">
+                    {data.map((record) => {
+                      const recordId = getRecordId(record);
+                      return (
+                        <Card key={recordId} className="modern-table__row hover:shadow-md">
+                          <CardContent className="modern-table__row-content p-4">
+                            <div className="modern-table__row-inner flex items-start gap-3 md:items-center md:space-x-4">
+                              {selectable && (
+                                <div className="modern-table__selection">
+                                  <Checkbox
+                                    checked={selectedIds.includes(recordId)}
+                                    onCheckedChange={(checked) => {
+                                      handleSelectRecord(recordId, checked);
+                                    }}
+                                    className="rounded-md"
+                                  />
+                                </div>
+                              )}
 
-                          {columns.map((column) => (
-                            <div
-                              key={column.key}
-                              className={cn(column.width || "flex-1", "min-w-0", column.className)}
-                            >
-                              {column.render
-                                ? column.render(
-                                    (record as Record<string, unknown>)[column.key],
-                                    record
-                                  )
-                                : (() => {
-                                    const cellValue = (record as Record<string, unknown>)[
-                                      column.key
-                                    ];
-                                    return cellValue == null ? "" : String(cellValue);
-                                  })()}
-                            </div>
-                          ))}
-
-                          {actions.length > 0 && (
-                            <div className="w-12">
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
-                                  >
-                                    <MoreHorizontal className="h-4 w-4" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent
-                                  align="end"
-                                  className="rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
+                              {columns.map((column) => (
+                                <div
+                                  key={column.key}
+                                  className={cn(
+                                    "modern-table__cell",
+                                    column.key === "actions" && "modern-table__cell--actions",
+                                    column.width || "flex-1",
+                                    "min-w-0 shrink-0",
+                                    column.className
+                                  )}
+                                  data-column-key={column.key}
                                 >
-                                  <DropdownMenuLabel className="text-gray-700 dark:text-gray-300">
-                                    操作
-                                  </DropdownMenuLabel>
-                                  <DropdownMenuSeparator />
-                                  {actions.map((action) => {
-                                    const actionVariant = resolveActionVariant(action, record);
-                                    return (
-                                      <DropdownMenuItem
-                                        key={action.key}
-                                        onClick={() => handleAction(action, record)}
-                                        className={cn(
-                                          "rounded-lg",
-                                          actionVariant === "danger" &&
-                                            "text-red-600 dark:text-red-400",
-                                          actionVariant === "warning" &&
-                                            "text-orange-600 dark:text-orange-400",
-                                          actionVariant === "success" &&
-                                            "text-green-600 dark:text-green-400",
-                                          action.className
-                                        )}
+                                  <div className="modern-table__cell-label md:hidden">
+                                    {column.title}
+                                  </div>
+                                  <div className="modern-table__cell-content">
+                                    {column.render
+                                      ? column.render(
+                                          (record as Record<string, unknown>)[column.key],
+                                          record
+                                        )
+                                      : (() => {
+                                          const cellValue = (record as Record<string, unknown>)[
+                                            column.key
+                                          ];
+                                          return cellValue == null ? "" : String(cellValue);
+                                        })()}
+                                  </div>
+                                </div>
+                              ))}
+
+                              {actions.length > 0 && (
+                                <div className="w-12 shrink-0">
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                      <Button
+                                        variant="ghost"
+                                        className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
                                       >
-                                        {action.icon && <span className="mr-2">{action.icon}</span>}
-                                        {typeof action.label === "function"
-                                          ? action.label(record)
-                                          : action.label}
-                                      </DropdownMenuItem>
-                                    );
-                                  })}
-                                </DropdownMenuContent>
-                              </DropdownMenu>
+                                        <MoreHorizontal className="h-4 w-4" />
+                                      </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent
+                                      align="end"
+                                      className="rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
+                                    >
+                                      <DropdownMenuLabel className="text-gray-700 dark:text-gray-300">
+                                        操作
+                                      </DropdownMenuLabel>
+                                      <DropdownMenuSeparator />
+                                      {actions.map((action) => {
+                                        const actionVariant = resolveActionVariant(action, record);
+                                        return (
+                                          <DropdownMenuItem
+                                            key={action.key}
+                                            onClick={() => handleAction(action, record)}
+                                            className={cn(
+                                              "rounded-lg",
+                                              actionVariant === "danger" &&
+                                                "text-red-600 dark:text-red-400",
+                                              actionVariant === "warning" &&
+                                                "text-orange-600 dark:text-orange-400",
+                                              actionVariant === "success" &&
+                                                "text-green-600 dark:text-green-400",
+                                              action.className
+                                            )}
+                                          >
+                                            {action.icon && (
+                                              <span className="mr-2">{action.icon}</span>
+                                            )}
+                                            {typeof action.label === "function"
+                                              ? action.label(record)
+                                              : action.label}
+                                          </DropdownMenuItem>
+                                        );
+                                      })}
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
+                                </div>
+                              )}
                             </div>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })
-              )}
-            </>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
           )}
       </div>
 

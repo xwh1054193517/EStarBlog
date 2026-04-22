@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import type { TagItem } from "@/lib/types";
 import { getTagFontSize } from "@/lib/utils";
@@ -9,25 +9,31 @@ import { useExpandable } from "@/hooks/useExpandable";
 export default function TagsCard({ tags }: { tags: TagItem[] }) {
   const tagCloudRef = useRef<HTMLDivElement>(null);
   const [needsExpand, setNeedsExpand] = useState(false);
-  const { isExpanded, toggleExpand } = useExpandable(false);
+  const { isExpanded, toggleExpand } = useExpandable();
+
+  const checkNeedsExpand = useCallback(() => {
+    if (tagCloudRef.current) {
+      const height = tagCloudRef.current.scrollHeight;
+      setNeedsExpand(height > 150);
+    }
+  }, []);
 
   useEffect(() => {
-    if (tagCloudRef.current && tagCloudRef.current.scrollHeight > 150) {
-      setNeedsExpand(true);
-    }
-  }, [tags]);
+    const timer = requestAnimationFrame(() => {
+      checkNeedsExpand();
+    });
+    return () => cancelAnimationFrame(timer);
+  }, [tags, checkNeedsExpand]);
 
   return (
     <div className="card-widget card-tags">
       <div className={`item-headline${isExpanded ? " is-expanded" : ""}`}>
         <i className="ri-price-tag-3-fill" />
-        <span>标签</span>
-        {needsExpand && (
-          <i
-            className={`collapse-icon ri-arrow-left-s-fill${isExpanded ? " is-expanded" : ""}`}
-            onClick={toggleExpand}
-          />
-        )}
+        <span>{"标签"}</span>
+        <i
+          className={`collapse-icon ri-arrow-left-s-fill${isExpanded ? " is-expanded" : ""}`}
+          onClick={toggleExpand}
+        />
       </div>
       <div
         ref={tagCloudRef}

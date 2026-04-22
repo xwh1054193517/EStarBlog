@@ -26,15 +26,21 @@ export class StatsService {
   }
 
   async getSiteStats() {
-    const [postCount, categoryCount, tagCount, onlineUsers, totalVisitors, totalPageViews] =
-      await Promise.all([
-        this.prisma.post.count({ where: { published: true } }),
-        this.prisma.category.count(),
-        this.prisma.tag.count(),
-        this.presenceService.getOnlineUsers(),
-        this.getTotalVisitors(),
-        this.getTotalPageViews(),
-      ]);
+    const [
+      postCount,
+      categoryCount,
+      tagCount,
+      onlineUsers,
+      totalVisitors,
+      totalPageViews,
+    ] = await Promise.all([
+      this.prisma.post.count({ where: { published: true } }),
+      this.prisma.category.count(),
+      this.prisma.tag.count(),
+      this.presenceService.getOnlineUsers(),
+      this.getTotalVisitors(),
+      this.getTotalPageViews(),
+    ]);
 
     const totalWords = await this.getTotalWords();
 

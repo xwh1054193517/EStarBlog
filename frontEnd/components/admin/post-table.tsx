@@ -334,23 +334,23 @@ export default function PostsTable({
       {
         key: "title",
         title: "文章信息",
-        width: "flex-1",
+        width: "flex-1 min-w-[240px]",
         render: (_: unknown, post: Post) => (
-          <div className="min-w-0">
+          <div className="w-full min-w-0 space-y-2">
             <Link
               href={`/admin/posts/${post.id}/edit`}
-              className="text-base font-semibold text-gray-900 dark:text-gray-100 hover:opacity-70 transition-colors block truncate"
+              className="post-table__title block w-full text-base font-semibold text-gray-900 transition-colors hover:opacity-70 dark:text-gray-100"
             >
               {post.title}
             </Link>
 
-            <div className="flex items-center space-x-3 mt-2 text-xs text-gray-500 dark:text-gray-400">
-              <div className="flex items-center space-x-1">
+            <div className="post-table__meta flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500 dark:text-gray-400">
+              <div className="post-table__meta-item flex min-w-0 items-center gap-1">
                 <Calendar className="h-3 w-3" />
                 <span>{formatDate(post.createdAt)}</span>
               </div>
               {post.category && (
-                <div className="flex items-center space-x-1">
+                <div className="post-table__meta-item flex min-w-0 items-center gap-1">
                   <span>{post.category.name}</span>
                 </div>
               )}

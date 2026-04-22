@@ -1,10 +1,10 @@
 "use client";
 
-import { use } from "react";
+import { use, useEffect } from "react";
 import Link from "next/link";
 import DefaultLayout from "@/components/layouts/DefaultLayout";
 import ArticleContent from "@/components/features/article/ArticleContent";
-import { useArticle } from "@/lib/api/article-api";
+import { useArticle, incrementArticleView } from "@/lib/api/article-api";
 import { extractToc } from "@/lib/toc";
 import type { SiteData } from "@/lib/types";
 
@@ -15,6 +15,12 @@ interface ArticleDetailProps {
 
 export default function ArticleDetail({ slug, siteData }: ArticleDetailProps) {
   const { data: article, isLoading, isError } = useArticle(slug);
+
+  useEffect(() => {
+    if (slug) {
+      incrementArticleView(slug);
+    }
+  }, [slug]);
 
   if (isLoading) {
     return (

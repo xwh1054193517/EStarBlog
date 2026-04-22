@@ -180,9 +180,21 @@ export default function TagDialog({ open, onClose, tag }: TagDialogProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>标签颜色（可选）</FormLabel>
-                  <FormControl>
-                    <Input placeholder="#3b82f6 或 blue" {...field} />
-                  </FormControl>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="color"
+                      value={field.value || "#3b82f6"}
+                      onChange={(e) => field.onChange(e.target.value)}
+                      className="w-10 h-10 rounded cursor-pointer border border-input"
+                    />
+                    <Input
+                      placeholder="#3b82f6"
+                      value={field.value || ""}
+                      onChange={(e) => field.onChange(e.target.value)}
+                      className="flex-1"
+                    />
+                  </div>
+                  <FormDescription>点击颜色块选择或输入颜色值</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

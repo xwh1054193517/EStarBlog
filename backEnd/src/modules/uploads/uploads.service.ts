@@ -63,6 +63,9 @@ export class UploadsService implements OnModuleInit {
     this.bucket = this.configService.get<string>('MINIO_BUCKET', 'app-files');
 
     this.publicUrl =
+      this.configService
+        .get<string>('MINIO_PUBLIC_BASE_URL', '')
+        .replace(/\/+$/, '') ||
       this.configService.get<string>('MINIO_PUBLIC_URL', '').replace(/\/+$/, '') ||
       `${protocol}://${endpoint}:${port}/${this.bucket}`;
 
@@ -112,6 +115,15 @@ export class UploadsService implements OnModuleInit {
     return `${safePrefix}${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${base}${ext}`;
   }
 
+  private buildPublicFileUrl(objectName: string) {
+    return `${this.publicUrl}/${objectName.replace(/^\/+/, '')}`;
+  }
+
+  private normalizeAssetUrl(storageKey: string, currentUrl?: string | null) {
+    if (!storageKey) return currentUrl || '';
+    return this.buildPublicFileUrl(storageKey);
+  }
+
   async getPresignedDownloadUrl(objectName: string, expiresIn = 3600) {
     const command = new GetObjectCommand({
       Bucket: this.bucket,
@@ -145,7 +157,7 @@ export class UploadsService implements OnModuleInit {
     );
 
     const previewUrl = await this.getPresignedDownloadUrl(objectName, 3600);
-    const url = `${this.publicUrl}/${objectName}`;
+    const url = this.buildPublicFileUrl(objectName);
 
     if (createdById) {
       await this.prisma.uploadAsset.create({
@@ -295,7 +307,7 @@ export class UploadsService implements OnModuleInit {
 
     const stat = await this.statFile(dto.objectName);
     const previewUrl = await this.getPresignedDownloadUrl(dto.objectName, 3600);
-    const url = `${this.publicUrl}/${dto.objectName}`;
+    const url = this.buildPublicFileUrl(dto.objectName);
 
     if (createdById) {
       await this.prisma.uploadAsset.create({
@@ -413,7 +425,10 @@ export class UploadsService implements OnModuleInit {
     ]);
 
     return {
-      data: assets,
+      data: assets.map((asset) => ({
+        ...asset,
+        url: this.normalizeAssetUrl(asset.storageKey, asset.url),
+      })),
       total,
       page,
       pageSize,

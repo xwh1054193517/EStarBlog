@@ -43,27 +43,37 @@ export default function TocCard({ toc }: TocCardProps) {
   }, []);
 
   const handleScroll = useCallback(() => {
-    const referencePoint = 64;
-
     if (toc.length === 0) return;
 
-    let closestHeading: TocItem | undefined;
-    let closestDistance = Infinity;
+    const referencePoint = 64;
+    const viewportHeight = window.innerHeight;
+    const scrollTop = window.scrollY;
+
+    let activeHeading: TocItem | undefined;
+    let minScore = Infinity;
 
     for (const heading of toc) {
       const element = document.getElementById(heading.id);
       if (!element) continue;
 
       const rect = element.getBoundingClientRect();
-      const distanceToReference = Math.abs(rect.top - referencePoint);
+      const absoluteTop = rect.top + scrollTop;
 
-      if (rect.top <= referencePoint + 50 && distanceToReference < closestDistance) {
-        closestDistance = distanceToReference;
-        closestHeading = heading;
+      if (rect.top <= referencePoint + 50) {
+        const distance = Math.abs(rect.top - referencePoint);
+        const score = distance;
+
+        if (score < minScore) {
+          minScore = score;
+          activeHeading = heading;
+        }
+      } else if (rect.top > referencePoint + 50 && rect.top < viewportHeight) {
+        activeHeading = heading;
+        break;
       }
     }
 
-    const targetId = closestHeading?.id ?? toc[0]?.id ?? "";
+    const targetId = activeHeading?.id ?? toc[toc.length - 1]?.id ?? toc[0]?.id ?? "";
     if (targetId !== activeIdRef.current) {
       activeIdRef.current = targetId;
       setActiveId(targetId);

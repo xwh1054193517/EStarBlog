@@ -18,10 +18,17 @@ export async function trackPageView(path?: string) {
   if (!visitorId) return;
 
   try {
-    await api.post("/stats/track", {
-      visitorId,
-      path: path || (typeof window !== "undefined" ? window.location.pathname : undefined)
-    });
+    await api.post(
+      "/stats/track",
+      {
+        visitorId,
+        path: path || (typeof window !== "undefined" ? window.location.pathname : undefined)
+      },
+      {
+        skipAuth: true,
+        skipRedirectOn401: true
+      }
+    );
   } catch (error) {
     console.warn("Failed to track page view:", error);
   }
@@ -38,10 +45,17 @@ export function startHeartbeat() {
     if (!visitorId) return;
 
     try {
-      await api.post("/stats/track", {
-        visitorId,
-        path: window.location.pathname
-      });
+      await api.post(
+        "/stats/track",
+        {
+          visitorId,
+          path: window.location.pathname
+        },
+        {
+          skipAuth: true,
+          skipRedirectOn401: true
+        }
+      );
     } catch (error) {
       console.warn("Failed to send heartbeat:", error);
     }
