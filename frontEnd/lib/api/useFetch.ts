@@ -89,9 +89,7 @@ async function waitForRefreshIfNeeded(skipAuth?: boolean): Promise<boolean> {
   return pendingRefreshPromise;
 }
 
-type RefreshRetryResult<T> =
-  | { refreshed: true; data: T }
-  | { refreshed: false };
+type RefreshRetryResult<T> = { refreshed: true; data: T } | { refreshed: false };
 
 async function refreshAndRetry<T>(retryRequest: () => Promise<T>): Promise<RefreshRetryResult<T>> {
   const refreshed = await doRefresh();
@@ -204,7 +202,8 @@ async function request<T>(endpoint: string, config: RequestConfig = {}): Promise
 
     const response = await fetch(buildUrl(endpoint, params), {
       ...rest,
-      headers: requestHeaders
+      headers: requestHeaders,
+      next: { revalidate: 60 }
     });
 
     if (response.status === 401 && !isRetry && !skipAuth) {
@@ -221,8 +220,7 @@ async function request<T>(endpoint: string, config: RequestConfig = {}): Promise
 }
 
 export const api = {
-  request: <T>(endpoint: string, config?: RequestConfig) =>
-    request<T>(endpoint, config),
+  request: <T>(endpoint: string, config?: RequestConfig) => request<T>(endpoint, config),
 
   get: <T>(endpoint: string, config?: RequestConfig) =>
     request<T>(endpoint, { ...config, method: "GET" }),
