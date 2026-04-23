@@ -32,7 +32,7 @@ import remarkGfm from "remark-gfm";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import LinkDialog from "./link-dialog";
-// import { AICompletion } from "@/lib/editor/ai-complete-extension";
+import { AIComplete } from "@/lib/editor/ai-complete-extension";
 import { markdownToJSON, jsonToMarkdown } from "@/lib/editor/markdown-converter";
 import { uploadFile } from "@/lib/api/uploadApi";
 
@@ -353,12 +353,13 @@ export default function TiptapEditorWrapper({
       }),
       Placeholder.configure({
         placeholder
+      }),
+      AIComplete.configure({
+        debounceTime: 500,
+        minChars: 3,
+        contextLength: 500,
+        apiUrl: "/api/ai/complete"
       })
-      //   AICompletion.configure({
-      //     debounceMs: 500,
-      //     minChars: 3,
-      //     apiEndpoint: "/api/ai/write/complete",
-      //   }),
     ],
     editorProps: {
       attributes: {

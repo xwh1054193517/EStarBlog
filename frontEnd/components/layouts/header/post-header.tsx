@@ -36,12 +36,13 @@ interface PostHeaderProps {
 export default function PostHeader({ article }: PostHeaderProps) {
   const wordCount = countWords(article.content);
   const readingTime = estimateReadingTime(article.content);
+  const coverImage = article.cover?.trim();
 
   return (
     <header
       className="post-header"
       style={{
-        backgroundImage: article.cover ? `url(${article.cover})` : "none"
+        backgroundImage: coverImage ? `url("${coverImage}")` : "none"
       }}
     >
       <div className="post-info">

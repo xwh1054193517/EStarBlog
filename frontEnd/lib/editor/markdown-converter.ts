@@ -14,6 +14,7 @@
 
 import { JSONContent } from "@tiptap/core";
 import MarkdownIt from "markdown-it";
+// @ts-ignore
 
 // 初始化 Markdown 解析器
 const md = new MarkdownIt({

@@ -25,5 +25,7 @@ export default function Header({
     return <PostHeader article={article} />;
   }
 
+  if (variant === "post") return null;
+
   return <HomeHeader systemConfig={siteData.blogConfig} />;
 }
