@@ -138,7 +138,7 @@ export class UploadsController {
     return this.uploadsService.getUserAssets(user.sub, page, pageSize);
   }
 
-  @Get(':objectName(.*)/presigned-url')
+  @Get(':objectName/presigned-url')
   @ApiOperation({ summary: '获取下载签名链接' })
   @ApiQuery({ name: 'expiresIn', required: false, example: 3600 })
   async getPresignedUrl(
@@ -154,7 +154,7 @@ export class UploadsController {
     };
   }
 
-  @Get(':objectName(.*)/download')
+  @Get(':objectName/download')
   @ApiOperation({ summary: '下载文件流' })
   async downloadFile(
     @Param('objectName') objectName: string,
@@ -171,7 +171,15 @@ export class UploadsController {
     file.stream.pipe(res);
   }
 
-  @Delete(':objectName(.*)')
+  @Delete()
+  @ApiOperation({ summary: '删除文件' })
+  @ApiQuery({ name: 'objectName', required: true })
+  @UseGuards(JwtAuthGuard)
+  async removeFileByQuery(@Query('objectName') objectName: string) {
+    return this.uploadsService.removeFile(objectName);
+  }
+
+  @Delete(':objectName')
   @ApiOperation({ summary: '删除文件' })
   @UseGuards(JwtAuthGuard)
   async removeFile(@Param('objectName') objectName: string) {

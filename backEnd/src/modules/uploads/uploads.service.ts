@@ -422,6 +422,10 @@ export class UploadsService implements OnModuleInit {
 
   // 删除文件
   async removeFile(objectName: string) {
+    if (!objectName) {
+      throw new BadRequestException('objectName 不能为空');
+    }
+
     await this.s3.send(
       new DeleteObjectCommand({
         Bucket: this.bucket,

@@ -139,7 +139,9 @@ export async function getPresignedUrl(
 }
 
 export async function deleteFile(objectName: string): Promise<void> {
-  return api.delete(`/uploads/${encodeURIComponent(objectName)}`);
+  return api.delete("/uploads", {
+    params: { objectName },
+  });
 }
 
 export function getFileUrl(objectName: string): string {
