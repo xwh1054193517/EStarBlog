@@ -1,4 +1,3 @@
-// @ts-expect-error markdown-it 缺少完整的 TypeScript 类型定义
 import MarkdownIt from "markdown-it";
 import anchor from "markdown-it-anchor";
 // @ts-expect-error 该第三方库缺少 TypeScript 类型定义文件
