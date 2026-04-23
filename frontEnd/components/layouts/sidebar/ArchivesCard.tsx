@@ -14,7 +14,6 @@ export default function ArchivesCard() {
   useEffect(() => {
     getArchives()
       .then((data) => {
-        console.log("Archives data:", data);
         setArchives(data || []);
       })
       .catch((err) => {

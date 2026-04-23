@@ -30,7 +30,6 @@ async function doRefreshSession(
   if (existingPromise) {
     return existingPromise;
   }
-  console.warn(storeGet().status, "doRefreshSession");
   const refreshToken = getCookie("refreshToken");
   if (!refreshToken) {
     deleteCookie("accessToken");

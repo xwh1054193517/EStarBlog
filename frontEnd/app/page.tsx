@@ -11,7 +11,6 @@ export default async function HomePage() {
   let articles = [];
   try {
     const articlesData = await getArticles({ page: 1, pageSize: 10 });
-    console.warn("articlesData", articlesData);
     articles = articlesData.items;
   } catch (error) {
     console.warn("Failed to fetch articles from API, using mock:", error);

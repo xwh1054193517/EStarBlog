@@ -334,7 +334,7 @@ export default function PostsTable({
       {
         key: "title",
         title: "文章信息",
-        width: "flex-1 min-w-[240px]",
+        width: "min-w-[280px] max-w-[520px] flex-[1_1_320px]",
         render: (_: unknown, post: Post) => (
           <div className="w-full min-w-0 space-y-2">
             <Link

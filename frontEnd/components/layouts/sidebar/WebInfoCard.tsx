@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import type { SiteStats as SiteStatsType } from "@/lib/api/statsApi";
 import { getSiteStats } from "@/lib/api/statsApi";
+import { useEffect, useState } from "react";
 
 function WebInfoCardLoading() {
   return (
@@ -30,14 +31,21 @@ function WebInfoCardLoading() {
 }
 
 function WebInfoCardContent() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const { data: stats } = useQuery<SiteStatsType>({
     queryKey: ["siteStats"],
     queryFn: getSiteStats,
     refetchInterval: 60000,
     staleTime: 30000,
+    enabled: mounted,
   });
 
-  if (!stats) {
+  if (!mounted || !stats) {
     return <WebInfoCardLoading />;
   }
 

@@ -750,9 +750,10 @@
 }
 
 .post-table__title {
-  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   word-break: normal;
-  overflow-wrap: break-word;
   line-height: 1.45;
 }
 

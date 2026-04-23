@@ -144,7 +144,6 @@ export async function getArticles(params?: {
 
   const queryString = searchParams.toString();
   const url = `${API_BASE_URL}/posts${queryString ? `?${queryString}` : ""}`;
-  console.warn("url", url);
 
   const response = await fetch(url);
 
@@ -153,7 +152,6 @@ export async function getArticles(params?: {
   }
 
   const data = await response.json();
-  console.warn("data", data);
   return {
     items: (data.items || []).map(convertPostToArticle),
     pagination: data.pagination || {
@@ -250,6 +248,7 @@ export async function incrementArticleView(slug: string): Promise<void> {
 }
 
 export interface AdminPostItem {
+  categoryId: string;
   id: string;
   title: string;
   slug: string;
@@ -298,6 +297,26 @@ export async function getAdminPosts(query?: AdminPostQuery): Promise<AdminPostLi
       totalPages: 0
     }
   };
+}
+
+export async function getAdminPostById(id: string): Promise<AdminPostItem> {
+  return api.get<AdminPostItem>(`/admin/posts/list/${id}`);
+}
+// 后端接口: POST /admin/posts
+// 前端函数: createPost()
+
+export async function createPost(data: {
+  title?: string;
+  content?: string;
+  excerpt?: string;
+  coverImage?: string;
+  published?: boolean;
+  featured?: boolean;
+  categoryId?: string;
+  tags?: string[];
+  publishedAt?: string;
+}): Promise<AdminPostItem> {
+  return api.post<AdminPostItem>("/admin/posts", data);
 }
 
 export async function updatePost(

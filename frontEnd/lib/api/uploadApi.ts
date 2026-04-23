@@ -1,4 +1,4 @@
-import { api, getCookie } from "./useFetch";
+import { api } from "./useFetch";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api";
 
@@ -23,6 +23,19 @@ interface AssetFromApi {
   storageKey: string;
   url: string;
   createdAt: string;
+}
+
+interface UploadFileResponse {
+  id?: string;
+  objectName?: string;
+  storageKey?: string;
+  filename?: string;
+  originalName?: string;
+  mimeType?: string;
+  size?: number;
+  url?: string;
+  previewUrl?: string;
+  createdAt?: string;
 }
 
 export interface AssetsResponse {
@@ -90,53 +103,26 @@ export async function uploadFile(
 ): Promise<UploadFile> {
   const formData = new FormData();
   formData.append("file", file);
-  if (prefix) {
-    formData.append("prefix", prefix);
-  }
 
-  const token = getCookie("accessToken");
-  const url = `${API_BASE_URL}/uploads/upload${prefix ? `?prefix=${encodeURIComponent(prefix)}` : ""}`;
+  onProgress?.(0);
 
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-
-    xhr.upload.onprogress = (event) => {
-      if (event.lengthComputable && onProgress) {
-        const progress = Math.round((event.loaded / event.total) * 100);
-        onProgress(progress);
-      }
-    };
-
-    xhr.onload = () => {
-      if (xhr.status >= 200 && xhr.status < 300) {
-        try {
-          const response = JSON.parse(xhr.responseText);
-          const result: UploadFile = {
-            id: response.id,
-            objectName: response.storageKey,
-            fileName: response.originalName || file.name,
-            fileType: getFileType(response.mimeType || file.type),
-            fileSize: response.size || file.size,
-            fileUrl: response.url,
-            createdAt: response.createdAt || new Date().toISOString(),
-          };
-          resolve(result);
-        } catch {
-          reject(new Error("Failed to parse response"));
-        }
-      } else {
-        reject(new Error(`Upload failed with status ${xhr.status}`));
-      }
-    };
-
-    xhr.onerror = () => reject(new Error("Network error"));
-
-    xhr.open("POST", url);
-    if (token) {
-      xhr.setRequestHeader("Authorization", `Bearer ${token}`);
-    }
-    xhr.send(formData);
+  const response = await api.postForm<UploadFileResponse>("/uploads/upload", formData, {
+    params: { prefix },
   });
+  const objectName = response.objectName || response.storageKey || response.filename || file.name;
+  const fileUrl = response.url || response.previewUrl || "";
+
+  onProgress?.(100);
+
+  return {
+    id: response.id || objectName,
+    objectName,
+    fileName: response.originalName || file.name,
+    fileType: getFileType(response.mimeType || file.type),
+    fileSize: response.size || file.size,
+    fileUrl,
+    createdAt: response.createdAt || new Date().toISOString(),
+  };
 }
 
 export async function getPresignedUrl(

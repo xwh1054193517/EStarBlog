@@ -394,7 +394,7 @@ export function ModernTable<T = unknown>({
                           "modern-table__header-cell",
                           column.width || "flex-1",
                           column.className,
-                          "flex shrink-0 items-center space-x-2"
+                          "flex min-w-0 items-center space-x-2"
                         )}
                       >
                         <span>{column.title}</span>
@@ -460,7 +460,7 @@ export function ModernTable<T = unknown>({
                                     "modern-table__cell",
                                     column.key === "actions" && "modern-table__cell--actions",
                                     column.width || "flex-1",
-                                    "min-w-0 shrink-0",
+                                    "min-w-0",
                                     column.className
                                   )}
                                   data-column-key={column.key}

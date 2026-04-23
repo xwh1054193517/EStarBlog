@@ -318,6 +318,7 @@ export class PostsService {
       publishedAt: post.publishedAt?.toISOString() ?? null,
       createdAt: post.createdAt.toISOString(),
       updatedAt: post.updatedAt.toISOString(),
+      categoryId: post.categoryId,
       category: post.category
         ? {
             id: post.category.id,
