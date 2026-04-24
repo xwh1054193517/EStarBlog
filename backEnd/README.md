@@ -16,6 +16,8 @@
 | Redis      | 会话存储 & 在线状态    |
 | JWT        | 身份认证               |
 | Swagger    | API 文档               |
+| Kimi AI    | 智能写作辅助           |
+| MinIO/S3   | 对象存储              |
 
 ---
 
@@ -40,7 +42,7 @@ graph TB
     subgraph Data
         PG[(PostgreSQL<br/>Database)]
         REDIS[(Redis<br/>Session & Presence)]
-        S3[(AWS S3<br/>File Storage)]
+        MINIO[(MinIO<br/>File Storage)]
     end
 
     WEB --> NGINX
@@ -48,139 +50,152 @@ graph TB
     NGINX --> API
     API --> PG
     API --> REDIS
-    API --> S3
+    API --> MINIO
 ```
 
 ---
 
+## 模块列表
+
+| 模块 | 功能 |
+|------|------|
+| **ai** | Kimi AI 对话和内容补全 |
+| **auth** | JWT 认证 & 会话管理 |
+| **posts** | 文章 CRUD |
+| **categories** | 分类管理 |
+| **tags** | 标签管理 |
+| **uploads** | 文件上传 (MinIO) |
+| **stats** | 数据统计 |
+| **presence** | 在线状态追踪 |
+| **site-config** | 站点配置 |
+| **profile** | 用户资料 |
+
 ---
 
-## 认证流程
+## API 列表
 
-```mermaid
-sequenceDiagram
-    participant Client
-    participant API
-    participant Redis
-    participant DB
+### AI 接口
 
-    Client->>API: POST /api/v1/auth/sessions<br/>{username, password}
-    API->>DB: 查询用户
-    DB-->>API: User
-    API->>API: bcrypt.compare(password)
-    API->>Redis: SET auth:session:{sessionId}
-    API-->>Client: {accessToken, refreshToken}
+| 方法 | 路径 | 功能 | 权限 |
+|------|------|------|------|
+| POST | /ai/chat | AI 对话 (Kimi) | 管理员 |
+| POST | /ai/complete | AI 内容补全 | 管理员 |
 
-    Client->>API: GET /admin/posts<br/>Authorization: Bearer {token}
-    API->>API: JWT verify
-    API->>Redis: GET auth:session:{sessionId}
-    Redis-->>API: Session
-    API-->>Client: Response
+### 认证接口
 
-    Note over Client,API: Token 过期时
-    Client->>API: POST /api/v1/auth/sessions/refresh<br/>{refreshToken}
-    API->>Redis: 验证会话
-    Redis-->>API: Session
-    API->>Redis: 更新会话
-    API-->>Client: {accessToken, refreshToken}
+| 方法 | 路径 | 功能 | 权限 |
+|------|------|------|------|
+| POST | /auth/sessions | 管理员登录 | 匿名 |
+| POST | /auth/sessions/refresh | 刷新Token | 匿名 |
+| DELETE | /auth/sessions/current | 登出 | 管理员 |
+| GET | /auth/me | 获取当前用户 | 管理员 |
+
+### 文章接口
+
+| 方法 | 路径 | 功能 | 权限 |
+|------|------|------|------|
+| GET | /posts | 获取公开文章列表 | 匿名 |
+| GET | /posts/:slug | 获取公开文章详情 | 匿名 |
+| POST | /posts/:slug/views | 增加浏览量 | 匿名 |
+| GET | /posts/archives | 获取文章归档 | 匿名 |
+| GET | /admin/posts | 获取所有文章 | 管理员 |
+| POST | /admin/posts | 创建文章 | 管理员 |
+| PATCH | /admin/posts/:id | 更新文章 | 管理员 |
+| DELETE | /admin/posts/:id | 删除文章 | 管理员 |
+
+### 分类接口
+
+| 方法 | 路径 | 功能 | 权限 |
+|------|------|------|------|
+| GET | /categories | 获取公开分类 | 匿名 |
+| GET | /admin/categories | 获取所有分类 | 管理员 |
+| POST | /admin/categories | 创建分类 | 管理员 |
+| PATCH | /admin/categories/:id | 更新分类 | 管理员 |
+| DELETE | /admin/categories/:id | 删除分类 | 管理员 |
+
+### 标签接口
+
+| 方法 | 路径 | 功能 | 权限 |
+|------|------|------|------|
+| GET | /tags | 获取公开标签 | 匿名 |
+| GET | /admin/tags | 获取所有标签 | 管理员 |
+| POST | /admin/tags | 创建标签 | 管理员 |
+| PATCH | /admin/tags/:id | 更新标签 | 管理员 |
+| DELETE | /admin/tags/:id | 删除标签 | 管理员 |
+
+### 上传接口
+
+| 方法 | 路径 | 功能 | 权限 |
+|------|------|------|------|
+| POST | /uploads | 上传文件 | 管理员 |
+| GET | /uploads/:id | 获取文件信息 | 管理员 |
+| DELETE | /uploads/:id | 删除文件 | 管理员 |
+| GET | /uploads/:objectName/presigned-url | 获取预签名URL | 管理员 |
+
+### 统计接口
+
+| 方法 | 路径 | 功能 | 权限 |
+|------|------|------|------|
+| GET | /stats/site | 获取站点统计 | 匿名 |
+| GET | /admin/stats/dashboard | 获取仪表盘统计 | 管理员 |
+
+### 其他接口
+
+| 方法 | 路径 | 功能 | 权限 |
+|------|------|------|------|
+| PUT | /presence/current | 发送心跳 | 匿名 |
+| GET | /health | 健康检查 | 匿名 |
+
+---
+
+## AI 接口详情
+
+### POST /ai/chat
+
+AI 对话接口，使用 Kimi (Moonshot AI) 模型。
+
+**请求体：**
+```json
+{
+  "messages": [
+    { "role": "system", "content": "你是一个助手" },
+    { "role": "user", "content": "你好" }
+  ],
+  "model": "moonshot-v1-32k",
+  "temperature": 0.7,
+  "maxTokens": 2000
+}
 ```
 
----
-
-## 模块关系
-
-```mermaid
-graph LR
-    subgraph Modules
-        AUTH[Auth Module<br/>认证 & 会话]
-        POSTS[Posts Module<br/>文章管理]
-        CATS[Categories Module<br/>分类管理]
-        TAGS[Tags Module<br/>标签管理]
-        UPLOADS[Uploads Module<br/>文件上传]
-        STATS[Stats Module<br/>数据统计]
-        PRESENCE[Presence Module<br/>在线状态]
-        HEALTH[Health Module<br/>健康检查]
-    end
-
-    subgraph Guards
-        JWT[JwtAuthGuard]
-        ROLES[RolesGuard]
-    end
-
-    AUTH --> JWT
-    POSTS --> JWT
-    POSTS --> ROLES
-    CATS --> JWT
-    CATS --> ROLES
-    TAGS --> JWT
-    TAGS --> ROLES
-    UPLOADS --> JWT
-    UPLOADS --> ROLES
-    STATS --> JWT
-    STATS --> ROLES
+**响应：**
+```json
+{
+  "content": "你好！有什么可以帮助你的吗？",
+  "tokensUsed": 50
+}
 ```
 
----
+### POST /ai/complete
 
-## API 分组
+AI 内容补全接口，根据上下文生成写作建议。
 
-```mermaid
-flowchart LR
-    subgraph 公开接口
-        PUB1[GET /posts]
-        PUB2[GET /posts/:slug]
-        PUB3[POST /posts/:slug/views]
-        PUB4[GET /categories]
-        PUB5[GET /tags]
-        PUB6[GET /stats/site]
-        PUB7[PUT /presence/current]
-        PUB8[POST /auth/sessions]
-        PUB9[POST /auth/sessions/refresh]
-        PUB10[GET /health]
-    end
-
-    subgraph 管理接口
-        ADMIN1[POST /admin/posts]
-        ADMIN2[PATCH /admin/posts/:id]
-        ADMIN3[DELETE /admin/posts/:id]
-        ADMIN4[POST /admin/categories]
-        ADMIN5[PATCH /admin/categories/:id]
-        ADMIN6[DELETE /admin/categories/:id]
-        ADMIN7[POST /admin/tags]
-        ADMIN8[PATCH /admin/tags/:id]
-        ADMIN9[DELETE /admin/tags/:id]
-        ADMIN10[POST /uploads]
-        ADMIN11[GET /uploads/:id]
-        ADMIN12[DELETE /uploads/:id]
-        ADMIN13[GET /admin/stats/dashboard]
-        ADMIN14[DELETE /auth/sessions/current]
-        ADMIN15[GET /auth/me]
-    end
-
-    PUB1 ~~~ PUB2 ~~~ PUB3 ~~~ PUB4 ~~~ PUB5 ~~~ PUB6 ~~~ PUB7 ~~~ PUB8 ~~~ PUB9 ~~~ PUB10
-    ADMIN1 ~~~ ADMIN2 ~~~ ADMIN3 ~~~ ADMIN4 ~~~ ADMIN5 ~~~ ADMIN6 ~~~ ADMIN7 ~~~ ADMIN8 ~~~ ADMIN9 ~~~ ADMIN10 ~~~ ADMIN11 ~~~ ADMIN12 ~~~ ADMIN13 ~~~ ADMIN14 ~~~ ADMIN15
+**请求体：**
+```json
+{
+  "content": "文章正文内容...",
+  "cursorPosition": 100,
+  "style": "专业"
+}
 ```
 
----
-
-## 在线状态追踪
-
-```mermaid
-graph TB
-    subgraph Redis
-        ZSET["ZSET: presence:visitors<br/>Score: timestamp<br/>Member: visitorId"]
-        KEY["String: presence:visitor:{id}<br/>TTL: 90s"]
-    end
-
-    subgraph 用户访问流程
-        V1["访客A 发送心跳"]
-        V2["ZADD 更新分数"]
-        V3["SET 设置独立key"]
-        V4["cleanup 清理过期"]
-        V5["返回在线人数"]
-    end
-
-    V1 --> V2 --> V3 --> V4 --> V5
+**响应：**
+```json
+{
+  "suggestions": [
+    { "text": "补全内容...", "confidence": 0.8 }
+  ],
+  "tokensUsed": 30
+}
 ```
 
 ---
@@ -188,7 +203,7 @@ graph TB
 ## 环境变量
 
 ```env
-# Database
+# 数据库
 DATABASE_URL="postgresql://user:password@localhost:5432/vxblog"
 
 # Redis
@@ -200,13 +215,20 @@ JWT_SECRET=your-super-secret-key
 JWT_ACCESS_TOKEN_TTL_SECONDS=900
 JWT_REFRESH_TOKEN_TTL_SECONDS=604800
 
-# AWS S3
-AWS_S3_BUCKET=your-bucket
-AWS_S3_REGION=us-east-1
-AWS_ACCESS_KEY_ID=your-key
-AWS_SECRET_ACCESS_KEY=your-secret
+# MinIO (对象存储)
+MINIO_ENDPOINT=localhost
+MINIO_PORT=9000
+MINIO_USE_SSL=false
+MINIO_ACCESS_KEY=your-access-key
+MINIO_SECRET_KEY=your-secret-key
+MINIO_BUCKET=blog
 
-# Server
+# Kimi AI
+KIMI_API_KEY=your-kimi-api-key
+KIMI_BASE_URL=https://api.moonshot.cn/v1
+KIMI_MODEL=moonshot-v1-32k
+
+# 服务端口
 PORT=3001
 ```
 
@@ -238,13 +260,13 @@ pnpm run start:prod
 
 ```bash
 # 构建镜像
-docker build -t vx-blog .
+docker build -t es-blog-backend .
 
 # 运行容器
 docker run -d \
   -p 3001:3001 \
   --env-file .env \
-  vx-blog
+  es-blog-backend
 ```
 
 ---
@@ -252,41 +274,6 @@ docker run -d \
 ## API 文档
 
 启动服务后访问: http://localhost:3001/api/docs
-
----
-
-## 接口总览
-
-| 方法   | 路径                   | 功能             | 权限   |
-| ------ | ---------------------- | ---------------- | ------ |
-| POST   | /auth/sessions         | 管理员登录       | 匿名   |
-| POST   | /auth/sessions/refresh | 刷新Token        | 匿名   |
-| DELETE | /auth/sessions/current | 登出             | 管理员 |
-| GET    | /auth/me               | 获取当前用户     | 管理员 |
-| GET    | /posts                 | 获取公开文章列表 | 匿名   |
-| GET    | /posts/:slug           | 获取公开文章详情 | 匿名   |
-| POST   | /posts/:slug/views     | 增加浏览量       | 匿名   |
-| GET    | /admin/posts           | 获取所有文章     | 管理员 |
-| POST   | /admin/posts           | 创建文章         | 管理员 |
-| PATCH  | /admin/posts/:id       | 更新文章         | 管理员 |
-| DELETE | /admin/posts/:id       | 删除文章         | 管理员 |
-| GET    | /categories            | 获取公开分类     | 匿名   |
-| GET    | /admin/categories      | 获取所有分类     | 管理员 |
-| POST   | /admin/categories      | 创建分类         | 管理员 |
-| PATCH  | /admin/categories/:id  | 更新分类         | 管理员 |
-| DELETE | /admin/categories/:id  | 删除分类         | 管理员 |
-| GET    | /tags                  | 获取公开标签     | 匿名   |
-| GET    | /admin/tags            | 获取所有标签     | 管理员 |
-| POST   | /admin/tags            | 创建标签         | 管理员 |
-| PATCH  | /admin/tags/:id        | 更新标签         | 管理员 |
-| DELETE | /admin/tags/:id        | 删除标签         | 管理员 |
-| POST   | /uploads               | 上传文件         | 管理员 |
-| GET    | /uploads/:id           | 获取文件信息     | 管理员 |
-| DELETE | /uploads/:id           | 删除文件         | 管理员 |
-| GET    | /stats/site            | 获取站点统计     | 匿名   |
-| GET    | /admin/stats/dashboard | 获取仪表盘统计   | 管理员 |
-| PUT    | /presence/current      | 发送心跳         | 匿名   |
-| GET    | /health                | 健康检查         | 匿名   |
 
 ---
 

@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AuthModule } from './modules/auth/auth.module';
+import { AiModule } from './modules/ai/ai.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { ProfileModule } from './modules/profile/profile.module';
 import { RolesGuard } from './common/guards/roles.guard';
@@ -24,6 +25,7 @@ import { SiteConfigModule } from './modules/site-config/site-config.module';
     ScheduleModule.forRoot(),
     PrismaModule,
     RedisModule,
+    AiModule,
     AuthModule,
     PostsModule,
     CategoriesModule,

@@ -1,14 +1,12 @@
 "use client";
 
-import { Category } from "@/lib/api/categoryApi";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { X, Send, Save, ImageIcon } from "lucide-react";
-import { jsonToMarkdown } from "@/lib/editor/markdown-converter";
 import { Badge } from "../ui/badge";
 import TiptapEditorWrapper from "./tiptap-editor-wrapper";
 import PublishDialog, { type PublishData } from "./publish-dialog";
+import AIAssistant from "./ai-assistant";
 
 interface FullscreenEditorProps {
   title: string;
@@ -45,7 +43,8 @@ export default function FullscreenEditor({
   const [charCount, setCharCount] = useState(0);
   // 编辑器实例引用
   const editorRef = useRef<any>(null);
-
+  // AI 生成的数据（传递给发布对话框）
+  const [aiExcerpt, setAiExcerpt] = useState<string | undefined>();
   useEffect(() => {
     // 计算单词数和字符数
     const textContent = content.replace(/[#*`_\[\]()!-]/g, "").trim();
@@ -116,9 +115,21 @@ export default function FullscreenEditor({
               <span>{wordCount} 词</span>
               <span>{charCount} 字符</span>
             </div>
-
-            {/* 操作按钮 */}
-
+            {/* ai助手 */}
+            <AIAssistant
+              content={content}
+              title={title}
+              onTitleSelect={(newTitle) => onTitleChange(newTitle)}
+              onExcerptGenerated={(excerpt) => setAiExcerpt(excerpt)}
+              onContentInsert={(text) => {
+                // 将内容插入到编辑器末尾
+                onContentChange(content + "\n\n" + text);
+              }}
+              onContentReplace={(text) => {
+                // 润色功能：替换整个内容
+                onContentChange(text);
+              }}
+            />
             {/* <Button
               variant="outline"
               size="sm"
@@ -129,7 +140,6 @@ export default function FullscreenEditor({
               <Save className="h-4 w-4 mr-2" />
               保存草稿
             </Button> */}
-
             <Button
               size="sm"
               onClick={() => setShowPublicDialog(true)}
@@ -176,7 +186,7 @@ export default function FullscreenEditor({
         open={showPublicDialog}
         onClose={() => setShowPublicDialog(false)}
         onPublish={handlePulish}
-        initialData={initialPublishData}
+        initialData={{ ...initialPublishData, excerpt: aiExcerpt || initialPublishData?.excerpt }}
         postTitle={title}
         isPublishing={isLoading}
       />
